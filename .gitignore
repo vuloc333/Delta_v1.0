@@ -1,0 +1,30 @@
+# --- C# / InterfaceApp (WinForms/WPF) ---
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.sln.docstates
+.vs/
+
+# --- Python (nếu giao diện dùng Python) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# --- PLC Program (Siemens, Rockwell, v.v.) ---
+# Loại bỏ các file log và file tạm khi nén/xuất chương trình
+*.log
+*.tmp
+*.bak
+# Nếu dùng TIA Portal, loại bỏ thư mục IM (Intermediate)
+/IM/
+/System/
+/Logs/
+
+# --- General System Files ---
+.DS_Store
+Thumbs.db
