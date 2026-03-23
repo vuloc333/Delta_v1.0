@@ -1,0 +1,26 @@
+{
+    "connection": {
+        "ip_plc": "192.168.2.43"
+    },
+    "robot_params": {
+        "arm1": {
+            "run_speed": 500,
+            "ramp": 100,
+            "jog_speed": 200,
+            "gear_ratio": 10,
+            "micro_step": 16
+        },
+        "arm2": {
+            "run_speed": 500,
+            "ramp": 100,
+            "jog_speed": 200,
+            "gear_ratio": 10,
+            "micro_step": 16
+        },
+        "conveyor": {
+            "speed": 300,
+            "ramp": 50
+        }
+    },
+    "last_update": "2026-03-23 13:34:52"
+}
