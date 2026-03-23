@@ -1,4 +1,4 @@
-import datetime  # Dùng thư viện chuẩn của Python
+import datetime
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QWidget
 from pyqt.Services.ui_widget import Ui_wgDelta_Control
@@ -11,7 +11,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.setupUi(self)
         self.setWindowTitle("Delta Robot Control Panel")
 
-        self.config_manager = ConfigManager("pyqt\\config.json")
+        self.config_manager = ConfigManager("pyqt\\Services\\config.json")
 
         self.load_config()
 
@@ -19,7 +19,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.btnLoadPara.clicked.connect(self.load_config)
         self.btnPlcConnect.clicked.connect(self.connect_plc)
         self.btnPlcDisconnect.clicked.connect(self.disconnect_plc)
-
+        self.btnSaveTeaching.clicked.connect(self.teaching_save)
 
         self.plc = None
         self.timer = QTimer()
@@ -49,6 +49,13 @@ class Widget(QWidget, Ui_wgDelta_Control):
 
     def get_ui_mapping(self):
         return {
+
+            "Para": {
+                "RadiusBase": self.lineBaseRadius,
+                "RadiusEE": self.lineEeRadius,
+                "BicepLength": self.lineBicepLength,
+                "ForeArmLength": self.lineForeArmLength,
+            },
             "arm1": {
                 "run_speed": self.lineArm1RunSpeed,
                 "ramp": self.lineArm1Ramp,
@@ -62,6 +69,25 @@ class Widget(QWidget, Ui_wgDelta_Control):
                 "jog_speed": self.lineArm2JogSpeed,
                 "gear_ratio": self.lineArm2Gear,
                 "micro_step": self.lineArm2MicroStepMode,
+            },
+            "arm3": {
+                "run_speed": self.lineArm3RunSpeed,
+                "ramp": self.lineArm3Ramp,
+                "jog_speed": self.lineArm3JogSpeed,
+                "gear_ratio": self.lineArm3Gear,
+                "micro_step": self.lineArm3MicroStepMode,
+            },
+            "teaching": {
+                "z_prepick": self.lineZPrepick,
+                "z_offset_pd": self.lineZoffsetPd,
+                "z_class": self.lineZClass,
+                "z_pitch_class": self.lineZPitchClass,
+                "x_class_red": self.lineXClassRed,
+                "y_class_red": self.lineYClassRed,
+                "x_class_yel": self.lineXClassYel,
+                "y_class_yel": self.lineYClassYel,
+                "x_class_grn": self.lineXClassGrn,
+                "y_class_grn": self.lineYClassGrn,
             },
             "conveyor": {
                 "speed": self.lineConvSpeed,
@@ -122,6 +148,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.lineArm3CurPos.setText(str(self.plc.i_deltaData3))
 
     def updatePlc(self):
+
         # Write bit logic (giữ nguyên)
         self.plc.o_deltabit0_0 = self.btnArm1JogFw.isDown()
         self.plc.o_deltabit0_1 = self.btnArm1JogBw.isDown()
@@ -160,3 +187,30 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_deltaData17 = s_int(self.lineConvRamp)
 
         self.plc.Write_data()
+
+    def teaching_save(self):
+        
+        if self.plc is None:
+            print("PLC is not connected, Connect PLC first!")
+            return
+        
+        def s_int(edit): return int(edit.text() or 0)
+
+        self.plc.o_deltaData20 = s_int(self.lineZPrepick)
+        self.plc.o_deltaData21 = s_int(self.lineZoffsetPd)
+        self.plc.o_deltaData22 = s_int(self.lineZClass)
+        self.plc.o_deltaData23 = s_int(self.lineZPitchClass)
+
+        self.plc.o_deltaData24 = s_int(self.lineXClassRed)
+        self.plc.o_deltaData25 = s_int(self.lineYClassRed)
+
+        self.plc.o_deltaData26 = s_int(self.lineXClassYel)
+        self.plc.o_deltaData27 = s_int(self.lineYClassYel)
+
+        self.plc.o_deltaData28 = s_int(self.lineXClassGrn)
+        self.plc.o_deltaData29 = s_int(self.lineYClassGrn)
+
+        self.plc.Write_data()
+
+        # Implement teaching save logic here
+        print("Teaching parameters saved.")
