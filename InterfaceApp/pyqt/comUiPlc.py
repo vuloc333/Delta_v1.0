@@ -149,7 +149,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
 
     def updatePlc(self):
 
-        # Write bit logic (giữ nguyên)
+        # Write bit logic 
         self.plc.o_deltabit0_0 = self.btnArm1JogFw.isDown()
         self.plc.o_deltabit0_1 = self.btnArm1JogBw.isDown()
         self.plc.o_deltabit0_2 = self.btnArm1Home.isDown()
@@ -186,6 +186,20 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_deltaData16 = s_int(self.lineConvSpeed)
         self.plc.o_deltaData17 = s_int(self.lineConvRamp)
 
+        self.plc.o_deltaData20 = s_int(self.lineZPrepick)
+        self.plc.o_deltaData21 = s_int(self.lineZoffsetPd)
+        self.plc.o_deltaData22 = s_int(self.lineZClass)
+        self.plc.o_deltaData23 = s_int(self.lineZPitchClass)
+
+        self.plc.o_deltaData24 = s_int(self.lineXClassRed)
+        self.plc.o_deltaData25 = s_int(self.lineYClassRed)
+
+        self.plc.o_deltaData26 = s_int(self.lineXClassYel)
+        self.plc.o_deltaData27 = s_int(self.lineYClassYel)
+
+        self.plc.o_deltaData28 = s_int(self.lineXClassGrn)
+        self.plc.o_deltaData29 = s_int(self.lineYClassGrn)
+
         self.plc.Write_data()
 
     def teaching_save(self):
@@ -210,7 +224,5 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_deltaData28 = s_int(self.lineXClassGrn)
         self.plc.o_deltaData29 = s_int(self.lineYClassGrn)
 
-        self.plc.Write_data()
-
         # Implement teaching save logic here
-        print("Teaching parameters saved.")
+        print("Teaching parameters saved!")
