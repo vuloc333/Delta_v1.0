@@ -1,84 +1,141 @@
-from com.Services.plc_com import plc_com
+import snap7
+from snap7.util import get_bool, get_int, set_bool, set_int
+import numpy as np
 
-class plc_map(plc_com):
+class plc_map():
         def __init__(self, ip_address):
                 super().__init__()
+                self.client = snap7.client.Client()
                 self.client.connect(ip_address, 0, 1)
                 
                 if self.client.get_connected():
                         print("Connect successfully!")
                 #Initial Write Variable
                 self.initWriteVar()
- 
+                self.read_db_number =  int(2)
+                self.write_db_number = int(1)
+
+                #Initial data to write
+
+                self.dbLength = int(82)
+                self.byteofBit = int(4)
+                self.byteofData = int(40)
+                self.startData = int(4)
+
+                self.i_Bit = np.zeros((self.byteofBit,8), dtype = bool)
+                self.i_Data = np.zeros((self.byteofData + 1), dtype = int)
+                
+                self.o_Bit = np.zeros((self.byteofBit,8), dtype = bool)
+                self.o_Data = np.zeros((self.byteofData + 1), dtype = int)
+
+        def Read_data(self):
+
+                self.data_read = self.client.db_read(self.read_db_number, 0, self.dbLength)
+
+                for i in range(self.byteofBit):
+                        for j in range (8):
+                                self.i_Bit[i][j] = get_bool(self.data_read, i, j)
+
+                for i in range(self.startData, self.dbLength - 1, 2):
+                        numarr = (i - self.startData) / 2 + 1
+                        numarr = int(numarr)
+                        self.i_Data[numarr] = get_int(self.data_read, i) 
+
+                self.MakeReadArray()
+
+        def Write_data(self):
+                
+                self.MakeWriteArray()
+
+                WriteData = bytearray(self.dbLength)
+                for i in range (self.byteofBit):
+                        for j in range (8):
+                                snap7.util.set_bool(WriteData, i, j, self.o_Bit[i, j])
+
+                for i in range(self.startData, self.dbLength - 1, 2):
+                        numarr = (i - self.startData) / 2 + 1
+                        numarr = int(numarr)
+                        snap7.util.set_int(WriteData, i, self.o_Data[numarr])
+                
+                self.client.db_write(self.write_db_number, 0, WriteData)
+
         def initWriteVar(self):
-                self.o_deltabit0_0 = 0 
-                self.o_deltabit0_1 = 0 
-                self.o_deltabit0_2 = 0 
+                self.o_Arm1JogFw = 0 
+                self.o_Arm1JogBw = 0 
+                self.o_Arm1Home = 0 
                 self.o_deltabit0_3 = 0 
                 self.o_deltabit0_4 = 0 
                 self.o_deltabit0_5 = 0 
                 self.o_deltabit0_6 = 0 
                 self.o_deltabit0_7 = 0 
-                self.o_deltabit1_0 = 0 
-                self.o_deltabit1_1 = 0 
-                self.o_deltabit1_2 = 0 
+                self.o_Arm2JogFw = 0 
+                self.o_Arm2JogBw = 0 
+                self.o_Arm2Home = 0 
                 self.o_deltabit1_3 = 0 
                 self.o_deltabit1_4 = 0 
                 self.o_deltabit1_5 = 0 
                 self.o_deltabit1_6 = 0 
                 self.o_deltabit1_7 = 0 
-                self.o_deltabit2_0 = 0 
-                self.o_deltabit2_1 = 0 
-                self.o_deltabit2_2 = 0 
+                self.o_Arm3JogFw = 0 
+                self.o_Arm3JogBw = 0 
+                self.o_Arm3Home = 0 
                 self.o_deltabit2_3 = 0 
                 self.o_deltabit2_4 = 0 
                 self.o_deltabit2_5 = 0 
                 self.o_deltabit2_6 = 0 
                 self.o_deltabit2_7 = 0 
+                self.o_AllHome = 0 
+                self.o_deltabit3_1 = 0 
+                self.o_deltabit3_2 = 0 
+                self.o_deltabit3_3 = 0 
+                self.o_deltabit3_4 = 0 
+                self.o_deltabit3_5 = 0 
+                self.o_deltabit3_6 = 0 
+                self.o_deltabit3_7 = 0 
 
-                self.o_deltaData1  = 0 
-                self.o_deltaData2  = 0 
-                self.o_deltaData3  = 0 
-                self.o_deltaData4  = 0 
-                self.o_deltaData5  = 0 
+                self.o_arm1RunSpeed  = 0 
+                self.o_arm1Ramp = 0 
+                self.o_arm1JogSpeed  = 0 
+                self.o_arm1gear = 0 
+                self.o_arm1MicroStep = 0 
                 self.o_deltaData6  = 0 
                 self.o_deltaData7  = 0 
                 self.o_deltaData8  = 0 
                 self.o_deltaData9  = 0 
                 self.o_deltaData10 = 0 
-                self.o_deltaData11 = 0 
-                self.o_deltaData12 = 0 
-                self.o_deltaData13 = 0 
-                self.o_deltaData14 = 0 
-                self.o_deltaData15 = 0 
+                self.o_arm2RunSpeed = 0 
+                self.o_arm2Ramp = 0 
+                self.o_arm2JogSpeed = 0 
+                self.o_arm2gear = 0 
+                self.o_arm2MicroStep = 0 
                 self.o_deltaData16 = 0 
                 self.o_deltaData17 = 0 
                 self.o_deltaData18 = -1
                 self.o_deltaData19 = -1
                 self.o_deltaData20 = -1
-                self.o_deltaData21  = -1 
-                self.o_deltaData22  = -1 
-                self.o_deltaData23  = -1 
-                self.o_deltaData24  = -1 
-                self.o_deltaData25  = -1 
+                self.o_arm3RunSpeed  = -1 
+                self.o_arm3Ramp  = -1 
+                self.o_arm3JogSpeed  = -1 
+                self.o_arm3gear  = -1 
+                self.o_arm3MicroStep  = -1 
                 self.o_deltaData26  = -1 
                 self.o_deltaData27  = -1 
                 self.o_deltaData28  = -1
                 self.o_deltaData29  = -1
                 self.o_deltaData30  = -1 
-                self.o_deltaData31  = -1 
-                self.o_deltaData32  = -1 
+                self.o_ConvRunSpeed  = -1 
+                self.o_ConvRamp  = -1 
                 self.o_deltaData33  = -1 
                 self.o_deltaData34  = -1 
-                self.o_deltaData35  = -1 
-                self.o_deltaData36  = -1 
-                self.o_deltaData37  = -1 
-                self.o_deltaData38  = -1 
-                self.o_deltaData39  = -1 
+                self.o_zPrePick  = -1 
+                self.o_zClass  = -1 
+                self.o_zPitchClass  = -1 
+                self.o_yPitchClass  = -1 
+                self.o_xClass1  = -1 
                 self.o_deltaData40  = -1 
         #initial PLC to PC data:
-        def Read_data(self):
-                self.read_data_array()
+        def MakeReadArray(self):
+
                 self.i_deltabit0_0 = self.i_Bit[0][0]
                 self.i_deltabit0_1 = self.i_Bit[0][1]
                 self.i_deltabit0_2 = self.i_Bit[0][2]
@@ -145,73 +202,90 @@ class plc_map(plc_com):
                 self.i_deltaData39 = self.i_Data[39]
                 self.i_deltaData40 = self.i_Data[40]    
         #initial PLC to PC data:
-        def Write_data(self):
-                self.o_Bit[0][0] = self.o_deltabit0_0
-                self.o_Bit[0][1] = self.o_deltabit0_1
-                self.o_Bit[0][2] = self.o_deltabit0_2
+        def MakeWriteArray(self):
+
+                #Bit
+                self.o_Bit[0][0] = self.o_Arm1JogFw
+                self.o_Bit[0][1] = self.o_Arm1JogBw
+                self.o_Bit[0][2] = self.o_Arm1Home
                 self.o_Bit[0][3] = self.o_deltabit0_3
                 self.o_Bit[0][4] = self.o_deltabit0_4
                 self.o_Bit[0][5] = self.o_deltabit0_5
                 self.o_Bit[0][6] = self.o_deltabit0_6
                 self.o_Bit[0][7] = self.o_deltabit0_7
-                self.o_Bit[1][0] = self.o_deltabit1_0
-                self.o_Bit[1][1] = self.o_deltabit1_1
-                self.o_Bit[1][2] = self.o_deltabit1_2
+
+                self.o_Bit[1][0] = self.o_Arm2JogFw
+                self.o_Bit[1][1] = self.o_Arm2JogBw
+                self.o_Bit[1][2] = self.o_Arm2Home
                 self.o_Bit[1][3] = self.o_deltabit1_3
                 self.o_Bit[1][4] = self.o_deltabit1_4
                 self.o_Bit[1][5] = self.o_deltabit1_5
                 self.o_Bit[1][6] = self.o_deltabit1_6
                 self.o_Bit[2][7] = self.o_deltabit1_7
-                self.o_Bit[2][0] = self.o_deltabit2_0
-                self.o_Bit[2][1] = self.o_deltabit2_1
-                self.o_Bit[2][2] = self.o_deltabit2_2
+
+                self.o_Bit[2][0] = self.o_Arm3JogFw
+                self.o_Bit[2][1] = self.o_Arm3JogBw
+                self.o_Bit[2][2] = self.o_Arm3Home
                 self.o_Bit[2][3] = self.o_deltabit2_3
                 self.o_Bit[2][4] = self.o_deltabit2_4
                 self.o_Bit[2][5] = self.o_deltabit2_5
                 self.o_Bit[2][6] = self.o_deltabit2_6
                 self.o_Bit[2][7] = self.o_deltabit2_7
 
-                self.o_Data[1] = self.o_deltaData1 
-                self.o_Data[2] = self.o_deltaData2 
-                self.o_Data[3] = self.o_deltaData3 
-                self.o_Data[4] = self.o_deltaData4 
-                self.o_Data[5] = self.o_deltaData5 
+                self.o_Bit[3][0] = self.o_AllHome
+                self.o_Bit[3][1] = self.o_deltabit3_1
+                self.o_Bit[3][2] = self.o_deltabit3_2
+                self.o_Bit[3][3] = self.o_deltabit3_3
+                self.o_Bit[3][4] = self.o_deltabit3_4
+                self.o_Bit[3][5] = self.o_deltabit3_5
+                self.o_Bit[3][6] = self.o_deltabit3_6
+                self.o_Bit[3][7] = self.o_deltabit3_7
+
+
+                #Data
+
+                self.o_Data[1] = self.o_arm1RunSpeed  
+                self.o_Data[2] = self.o_arm1Ramp
+                self.o_Data[3] = self.o_arm1JogSpeed 
+                self.o_Data[4] = self.o_arm1gear
+                self.o_Data[5] = self.o_arm1MicroStep
                 self.o_Data[6] = self.o_deltaData6 
                 self.o_Data[7] = self.o_deltaData7 
                 self.o_Data[8] = self.o_deltaData8 
                 self.o_Data[9] = self.o_deltaData9 
                 self.o_Data[10] = self.o_deltaData10
-                self.o_Data[11] = self.o_deltaData11
-                self.o_Data[12] = self.o_deltaData12
-                self.o_Data[13] = self.o_deltaData13
-                self.o_Data[14] = self.o_deltaData14
-                self.o_Data[15] = self.o_deltaData15
+
+                self.o_Data[11] = self.o_arm2RunSpeed
+                self.o_Data[12] = self.o_arm2Ramp
+                self.o_Data[13] = self.o_arm2JogSpeed
+                self.o_Data[14] = self.o_arm2gear
+                self.o_Data[15] = self.o_arm2MicroStep
                 self.o_Data[16] = self.o_deltaData16
                 self.o_Data[17] = self.o_deltaData17
                 self.o_Data[18] = self.o_deltaData18
                 self.o_Data[19] = self.o_deltaData19
                 self.o_Data[20] = self.o_deltaData20
-                self.o_Data[21] = self.o_deltaData21
-                self.o_Data[22] = self.o_deltaData22
-                self.o_Data[23] = self.o_deltaData23
-                self.o_Data[24] = self.o_deltaData24
-                self.o_Data[25] = self.o_deltaData25
+
+                self.o_Data[21] = self.o_arm3RunSpeed
+                self.o_Data[22] = self.o_arm3Ramp
+                self.o_Data[23] = self.o_arm3JogSpeed
+                self.o_Data[24] = self.o_arm3gear
+                self.o_Data[25] = self.o_arm3MicroStep
                 self.o_Data[26] = self.o_deltaData26
                 self.o_Data[27] = self.o_deltaData27
                 self.o_Data[28] = self.o_deltaData28
                 self.o_Data[29] = self.o_deltaData29
                 self.o_Data[30] = self.o_deltaData30
-                self.o_Data[31] = self.o_deltaData31
-                self.o_Data[32] = self.o_deltaData32
+
+                self.o_Data[31] = self.o_ConvRunSpeed
+                self.o_Data[32] = self.o_ConvRamp
                 self.o_Data[33] = self.o_deltaData33
                 self.o_Data[34] = self.o_deltaData34
-                self.o_Data[35] = self.o_deltaData35
-                self.o_Data[36] = self.o_deltaData36
-                self.o_Data[37] = self.o_deltaData37
-                self.o_Data[38] = self.o_deltaData38
-                self.o_Data[39] = self.o_deltaData39
+                self.o_Data[35] = self.o_zPrePick
+                self.o_Data[36] = self.o_zClass
+                self.o_Data[37] = self.o_zPitchClass
+                self.o_Data[38] = self.o_yPitchClass
+                self.o_Data[39] = self.o_xClass1
                 self.o_Data[40] = self.o_deltaData40
-
-                self.write_data_array()
 
 

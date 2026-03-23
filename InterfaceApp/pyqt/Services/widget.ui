@@ -414,7 +414,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl2_3">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>630</x>
        <y>230</y>
        <width>101</width>
        <height>21</height>
@@ -471,7 +471,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>190</y>
        <width>101</width>
        <height>21</height>
@@ -484,7 +484,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl3_2">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>320</x>
        <y>270</y>
        <width>101</width>
        <height>21</height>
@@ -623,7 +623,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl6">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>390</y>
        <width>101</width>
        <height>21</height>
@@ -676,7 +676,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl3_4">
      <property name="geometry">
       <rect>
-       <x>340</x>
+       <x>330</x>
        <y>520</y>
        <width>101</width>
        <height>21</height>
@@ -686,27 +686,10 @@ background-color: rgb(73, 220, 108);</string>
       <string>Tăng/Giảm tốc</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnArm2Home">
-     <property name="geometry">
-      <rect>
-       <x>340</x>
-       <y>440</y>
-       <width>75</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(241, 241, 241, 255), stop:1 rgba(255, 255, 255, 255));
-</string>
-     </property>
-     <property name="text">
-      <string>Home</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="lbl6_2">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>320</x>
        <y>390</y>
        <width>101</width>
        <height>21</height>
@@ -785,7 +768,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl2">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>230</y>
        <width>101</width>
        <height>21</height>
@@ -985,7 +968,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl3_3">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>630</x>
        <y>270</y>
        <width>101</width>
        <height>21</height>
@@ -1039,13 +1022,13 @@ background-color: rgb(73, 220, 108);</string>
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="btnArm1Home">
+    <widget class="QPushButton" name="btnAllHome">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>440</y>
-       <width>75</width>
-       <height>24</height>
+       <x>670</x>
+       <y>80</y>
+       <width>101</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -1081,7 +1064,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl4_3">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>630</x>
        <y>310</y>
        <width>101</width>
        <height>21</height>
@@ -1129,7 +1112,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl2_4">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>520</y>
        <width>101</width>
        <height>21</height>
@@ -1142,7 +1125,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl6_3">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>630</x>
        <y>390</y>
        <width>101</width>
        <height>21</height>
@@ -1155,7 +1138,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_2">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>320</x>
        <y>190</y>
        <width>101</width>
        <height>21</height>
@@ -1168,7 +1151,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl5_2">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>320</x>
        <y>350</y>
        <width>101</width>
        <height>21</height>
@@ -1198,7 +1181,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_3">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>630</x>
        <y>190</y>
        <width>101</width>
        <height>21</height>
@@ -1218,7 +1201,7 @@ background-color: rgb(73, 220, 108);</string>
       </rect>
      </property>
      <property name="text">
-      <string>(Degree)</string>
+      <string>(Pulse/s)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineArm3MicroStepMode">
@@ -1307,7 +1290,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl4">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>310</y>
        <width>101</width>
        <height>21</height>
@@ -1368,7 +1351,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl3">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>270</y>
        <width>101</width>
        <height>21</height>
@@ -1381,7 +1364,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl4_2">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>320</x>
        <y>310</y>
        <width>101</width>
        <height>21</height>
@@ -1389,23 +1372,6 @@ background-color: rgb(73, 220, 108);</string>
      </property>
      <property name="text">
       <string>Gear</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btnArm3Home">
-     <property name="geometry">
-      <rect>
-       <x>650</x>
-       <y>440</y>
-       <width>75</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(241, 241, 241, 255), stop:1 rgba(255, 255, 255, 255));
-</string>
-     </property>
-     <property name="text">
-      <string>Home</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineArm3Ramp">
@@ -1433,7 +1399,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl5_3">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>630</x>
        <y>350</y>
        <width>101</width>
        <height>21</height>
@@ -1514,7 +1480,7 @@ background-color: rgb(73, 220, 108);</string>
       </rect>
      </property>
      <property name="text">
-      <string>(Degree)</string>
+      <string>(Pulse/s)</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl1_18">
@@ -1540,7 +1506,7 @@ background-color: rgb(73, 220, 108);</string>
       </rect>
      </property>
      <property name="text">
-      <string>(Degree)</string>
+      <string>(Pulse/s)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineArm2CurPos">
@@ -1581,7 +1547,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl5">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>350</y>
        <width>101</width>
        <height>21</height>
@@ -1594,7 +1560,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl2_2">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>320</x>
        <y>230</y>
        <width>101</width>
        <height>21</height>
@@ -1641,7 +1607,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_55">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>80</y>
        <width>101</width>
        <height>21</height>
@@ -1689,7 +1655,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_57">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>110</y>
        <width>101</width>
        <height>21</height>
@@ -1737,7 +1703,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_59">
      <property name="geometry">
       <rect>
-       <x>340</x>
+       <x>330</x>
        <y>80</y>
        <width>131</width>
        <height>21</height>
@@ -1785,7 +1751,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_61">
      <property name="geometry">
       <rect>
-       <x>340</x>
+       <x>330</x>
        <y>110</y>
        <width>131</width>
        <height>21</height>
@@ -1833,7 +1799,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_74">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>670</y>
        <width>101</width>
        <height>21</height>
@@ -1903,7 +1869,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_76">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>700</y>
        <width>101</width>
        <height>21</height>
@@ -1939,7 +1905,7 @@ background-color: rgb(73, 220, 108);</string>
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>710</y>
+       <y>720</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -1964,17 +1930,17 @@ background-color: rgb(73, 220, 108);</string>
       <enum>QFrame::Shape::Box</enum>
      </property>
      <property name="text">
-      <string>Sản phẩm đỏ</string>
+      <string>Tọa độ phân loại 1</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineXClassRed">
+    <widget class="QLineEdit" name="lineXClass1">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>670</y>
+       <x>410</x>
+       <y>680</y>
        <width>113</width>
        <height>22</height>
       </rect>
@@ -1995,8 +1961,8 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_78">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>670</y>
+       <x>530</x>
+       <y>680</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -2009,7 +1975,7 @@ background-color: rgb(73, 220, 108);</string>
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>670</y>
+       <y>680</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -2021,8 +1987,8 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_82">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>710</y>
+       <x>530</x>
+       <y>720</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -2031,129 +1997,11 @@ background-color: rgb(73, 220, 108);</string>
       <string>mm</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineYClassRed">
+    <widget class="QLineEdit" name="lineYClass1">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>710</y>
-       <width>113</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="accessibleDescription">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_83">
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>710</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Tọa độ Y</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl7_9">
-     <property name="geometry">
-      <rect>
-       <x>610</x>
-       <y>630</y>
-       <width>101</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(241, 241, 241);</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Shape::Box</enum>
-     </property>
-     <property name="text">
-      <string>Sản phẩm vàng</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignCenter</set>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineXClassYel">
-     <property name="geometry">
-      <rect>
-       <x>600</x>
-       <y>670</y>
-       <width>113</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="accessibleDescription">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_84">
-     <property name="geometry">
-      <rect>
-       <x>720</x>
-       <y>670</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>mm</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_86">
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>670</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Tọa độ X</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_88">
-     <property name="geometry">
-      <rect>
-       <x>720</x>
-       <y>710</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>mm</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineYClassYel">
-     <property name="geometry">
-      <rect>
-       <x>600</x>
-       <y>710</y>
+       <x>410</x>
+       <y>720</y>
        <width>113</width>
        <height>22</height>
       </rect>
@@ -2222,7 +2070,7 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_85">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>730</y>
        <width>101</width>
        <height>21</height>
@@ -2292,139 +2140,21 @@ background-color: rgb(73, 220, 108);</string>
     <widget class="QLabel" name="lbl1_95">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>760</y>
        <width>101</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Pitch phân loại</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_96">
-     <property name="geometry">
-      <rect>
-       <x>770</x>
-       <y>710</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Tọa độ Y</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_97">
-     <property name="geometry">
-      <rect>
-       <x>950</x>
-       <y>670</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>mm</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_98">
-     <property name="geometry">
-      <rect>
-       <x>770</x>
-       <y>670</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Tọa độ X</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl1_99">
-     <property name="geometry">
-      <rect>
-       <x>950</x>
-       <y>710</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>mm</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineXClassGrn">
-     <property name="geometry">
-      <rect>
-       <x>830</x>
-       <y>670</y>
-       <width>113</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="accessibleDescription">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineYClassGrn">
-     <property name="geometry">
-      <rect>
-       <x>830</x>
-       <y>710</y>
-       <width>113</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="accessibleDescription">
-      <string/>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl7_11">
-     <property name="geometry">
-      <rect>
-       <x>840</x>
-       <y>630</y>
-       <width>101</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(241, 241, 241);</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Shape::Box</enum>
-     </property>
-     <property name="text">
-      <string>Sản phẩm xanh</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignCenter</set>
+      <string>Pitch Z phân loại</string>
      </property>
     </widget>
     <widget class="QPushButton" name="btnSaveTeaching">
      <property name="geometry">
       <rect>
        <x>820</x>
-       <y>570</y>
+       <y>740</y>
        <width>161</width>
        <height>41</height>
       </rect>
@@ -2441,7 +2171,7 @@ background-color: rgb(73, 220, 108);</string>
      <property name="geometry">
       <rect>
        <x>820</x>
-       <y>540</y>
+       <y>710</y>
        <width>161</width>
        <height>21</height>
       </rect>
@@ -2457,6 +2187,54 @@ background-color: rgb(73, 220, 108);</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineYPitchClass1">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>760</y>
+       <width>113</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="accessibleDescription">
+      <string/>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lbl1_96">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>760</y>
+       <width>101</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pitch Y phân loại</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lbl1_88">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>760</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mm</string>
      </property>
     </widget>
    </widget>
@@ -2479,7 +2257,7 @@ background-color: rgb(73, 220, 108);</string>
   <tabstop>lineArm1Gear</tabstop>
   <tabstop>lineArm1MicroStepMode</tabstop>
   <tabstop>lineArm1JogSpeed</tabstop>
-  <tabstop>btnArm1Home</tabstop>
+  <tabstop>btnAllHome</tabstop>
   <tabstop>btnArm1JogFw</tabstop>
   <tabstop>btnArm1JogBw</tabstop>
   <tabstop>lineArm2CurPos</tabstop>
@@ -2488,7 +2266,6 @@ background-color: rgb(73, 220, 108);</string>
   <tabstop>lineArm2Gear</tabstop>
   <tabstop>lineArm2MicroStepMode</tabstop>
   <tabstop>lineArm2JogSpeed</tabstop>
-  <tabstop>btnArm2Home</tabstop>
   <tabstop>btnArm2JogFw</tabstop>
   <tabstop>btnArm2JogBw</tabstop>
   <tabstop>lineArm3CurPos</tabstop>
@@ -2497,7 +2274,6 @@ background-color: rgb(73, 220, 108);</string>
   <tabstop>lineArm3Gear</tabstop>
   <tabstop>lineArm3MicroStepMode</tabstop>
   <tabstop>lineArm3JogSpeed</tabstop>
-  <tabstop>btnArm3Home</tabstop>
   <tabstop>btnArm3JogFw</tabstop>
   <tabstop>btnArm3JogBw</tabstop>
   <tabstop>lineConvSpeed</tabstop>

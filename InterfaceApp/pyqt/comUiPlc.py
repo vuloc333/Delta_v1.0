@@ -82,12 +82,9 @@ class Widget(QWidget, Ui_wgDelta_Control):
                 "z_offset_pd": self.lineZoffsetPd,
                 "z_class": self.lineZClass,
                 "z_pitch_class": self.lineZPitchClass,
-                "x_class_red": self.lineXClassRed,
-                "y_class_red": self.lineYClassRed,
-                "x_class_yel": self.lineXClassYel,
-                "y_class_yel": self.lineYClassYel,
-                "x_class_grn": self.lineXClassGrn,
-                "y_class_grn": self.lineYClassGrn,
+                "x_class1": self.lineXClass1,
+                "y_class1": self.lineYClass1,
+                "y_pitch_class1": self.lineYPitchClass1,
             },
             "conveyor": {
                 "speed": self.lineConvSpeed,
@@ -150,55 +147,49 @@ class Widget(QWidget, Ui_wgDelta_Control):
     def updatePlc(self):
 
         # Write bit logic 
-        self.plc.o_deltabit0_0 = self.btnArm1JogFw.isDown()
-        self.plc.o_deltabit0_1 = self.btnArm1JogBw.isDown()
-        self.plc.o_deltabit0_2 = self.btnArm1Home.isDown()
+        self.plc.o_Arm1JogFw = self.btnArm1JogFw.isDown()
+        self.plc.o_Arm1JogBw = self.btnArm1JogBw.isDown()
         
-        self.plc.o_deltabit1_0 = self.btnArm2JogFw.isDown()
-        self.plc.o_deltabit1_1 = self.btnArm2JogBw.isDown()
-        self.plc.o_deltabit1_2 = self.btnArm2Home.isDown()
+        self.plc.o_Arm2JogFw = self.btnArm2JogFw.isDown()
+        self.plc.o_Arm2JogBw = self.btnArm2JogBw.isDown()
 
-        self.plc.o_deltabit2_0 = self.btnArm3JogFw.isDown()
-        self.plc.o_deltabit2_1 = self.btnArm3JogBw.isDown()
-        self.plc.o_deltabit2_2 = self.btnArm3Home.isDown()
+        self.plc.o_Arm3JogFw = self.btnArm3JogFw.isDown()
+        self.plc.o_Arm3JogBw = self.btnArm3JogBw.isDown()
+
+        self.plc.o_AllHome = self.btnAllHome.isDown()
 
         # Write data logic
         def s_int(edit): return int(edit.text() or 0)
 
-        self.plc.o_deltaData1 = s_int(self.lineArm1RunSpeed)
-        self.plc.o_deltaData2 = s_int(self.lineArm1Ramp)
-        self.plc.o_deltaData3 = s_int(self.lineArm1JogSpeed)
-        self.plc.o_deltaData4 = s_int(self.lineArm1Gear)
-        self.plc.o_deltaData5 = s_int(self.lineArm1MicroStepMode)
+        self.plc.o_arm1RunSpeed = s_int(self.lineArm1RunSpeed)
+        self.plc.o_arm1Ramp = s_int(self.lineArm1Ramp)
+        self.plc.o_arm1JogSpeed = s_int(self.lineArm1JogSpeed)
+        self.plc.o_arm1gear = s_int(self.lineArm1Gear)
+        self.plc.o_arm1MicroStep = s_int(self.lineArm1MicroStepMode)
 
-        self.plc.o_deltaData6 = s_int(self.lineArm2RunSpeed)
-        self.plc.o_deltaData7 = s_int(self.lineArm2Ramp)
-        self.plc.o_deltaData8 = s_int(self.lineArm2JogSpeed)
-        self.plc.o_deltaData9 = s_int(self.lineArm2Gear)
-        self.plc.o_deltaData10 = s_int(self.lineArm2MicroStepMode)
+        self.plc.o_arm2RunSpeed = s_int(self.lineArm2RunSpeed)
+        self.plc.o_arm2Ramp = s_int(self.lineArm2Ramp)
+        self.plc.o_arm2JogSpeed = s_int(self.lineArm2JogSpeed)
+        self.plc.o_arm2gear = s_int(self.lineArm2Gear)
+        self.plc.o_arm2MicroStep = s_int(self.lineArm2MicroStepMode)
 
-        self.plc.o_deltaData11 = s_int(self.lineArm3RunSpeed)
-        self.plc.o_deltaData12 = s_int(self.lineArm3Ramp)
-        self.plc.o_deltaData13 = s_int(self.lineArm3JogSpeed)
-        self.plc.o_deltaData14 = s_int(self.lineArm3Gear)
-        self.plc.o_deltaData15 = s_int(self.lineArm3MicroStepMode)
+        self.plc.o_arm3RunSpeed = s_int(self.lineArm3RunSpeed)
+        self.plc.o_arm3Ramp = s_int(self.lineArm3Ramp)
+        self.plc.o_arm3JogSpeed = s_int(self.lineArm3JogSpeed)
+        self.plc.o_arm3gear = s_int(self.lineArm3Gear)
+        self.plc.o_arm3MicroStep = s_int(self.lineArm3MicroStepMode)
 
-        self.plc.o_deltaData16 = s_int(self.lineConvSpeed)
-        self.plc.o_deltaData17 = s_int(self.lineConvRamp)
+        self.plc.o_ConvRunSpeed = s_int(self.lineConvSpeed)
+        self.plc.o_ConvRamp = s_int(self.lineConvRamp)
 
-        self.plc.o_deltaData20 = s_int(self.lineZPrepick)
-        self.plc.o_deltaData21 = s_int(self.lineZoffsetPd)
-        self.plc.o_deltaData22 = s_int(self.lineZClass)
-        self.plc.o_deltaData23 = s_int(self.lineZPitchClass)
+        self.plc.o_zPrePick = s_int(self.lineZPrepick)
+        self.plc.o_zClass = s_int(self.lineZClass)
+        self.plc.o_zPitchClass = s_int(self.lineZPitchClass)
+        self.plc.o_yPitchClass = s_int(self.lineYPitchClass1)
 
-        self.plc.o_deltaData24 = s_int(self.lineXClassRed)
-        self.plc.o_deltaData25 = s_int(self.lineYClassRed)
+        self.plc.o_xClass1 = s_int(self.lineXClass1)
+        self.plc.o_yClass1 = s_int(self.lineYClass1)
 
-        self.plc.o_deltaData26 = s_int(self.lineXClassYel)
-        self.plc.o_deltaData27 = s_int(self.lineYClassYel)
-
-        self.plc.o_deltaData28 = s_int(self.lineXClassGrn)
-        self.plc.o_deltaData29 = s_int(self.lineYClassGrn)
 
         self.plc.Write_data()
 
@@ -225,4 +216,3 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_deltaData29 = s_int(self.lineYClassGrn)
 
         # Implement teaching save logic here
-        print("Teaching parameters saved!")

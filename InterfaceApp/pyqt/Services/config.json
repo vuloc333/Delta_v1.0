@@ -1,6 +1,6 @@
 {
     "connection": {
-        "ip_plc": "192.168.2.43"
+        "ip_plc": "192.168.1.111"
     },
     "robot_params": {
         "Para": {
@@ -35,17 +35,14 @@
             "z_offset_pd": -50,
             "z_class": -100,
             "z_pitch_class": 10,
-            "x_class_red": 100,
-            "y_class_red": 105,
-            "x_class_yel": 110,
-            "y_class_yel": 105,
-            "x_class_grn": 120,
-            "y_class_grn": 105
+            "x_class1": 0,
+            "y_class1": 0,
+            "y_pitch_class1": 0
         },
         "conveyor": {
             "speed": 300,
             "ramp": 50
         }
     },
-    "last_update": "2026-03-23 16:56:00"
+    "last_update": "2026-03-23 23:25:10"
 }
