@@ -1,4 +1,4 @@
-from com.plc_com import plc_com
+from com.Services.plc_com import plc_com
 
 class plc_map(plc_com):
         def __init__(self, ip_address):

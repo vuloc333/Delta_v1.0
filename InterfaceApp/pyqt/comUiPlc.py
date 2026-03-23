@@ -1,9 +1,9 @@
 import datetime  # Dùng thư viện chuẩn của Python
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QWidget
-from pyqt.ui_widget import Ui_wgDelta_Control
+from pyqt.Services.ui_widget import Ui_wgDelta_Control
 from com.plc_map import plc_map
-from pyqt.config_load import ConfigManager
+from pyqt.Services.config_load import ConfigManager
 
 class Widget(QWidget, Ui_wgDelta_Control):
     def __init__(self):
