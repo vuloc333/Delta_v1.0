@@ -60,6 +60,8 @@ class plc_map():
                 self.client.db_write(self.write_db_number, 0, WriteData)
 
         def initWriteVar(self):
+
+                #bit
                 self.o_Arm1JogFw = 0 
                 self.o_Arm1JogBw = 0 
                 self.o_Arm1Home = 0 
@@ -85,7 +87,7 @@ class plc_map():
                 self.o_deltabit2_6 = 0 
                 self.o_deltabit2_7 = 0 
                 self.o_AllHome = 0 
-                self.o_deltabit3_1 = 0 
+                self.o_AllMove = 0 
                 self.o_deltabit3_2 = 0 
                 self.o_deltabit3_3 = 0 
                 self.o_deltabit3_4 = 0 
@@ -93,14 +95,15 @@ class plc_map():
                 self.o_deltabit3_6 = 0 
                 self.o_deltabit3_7 = 0 
 
+                #Data
                 self.o_arm1RunSpeed  = 0 
                 self.o_arm1Ramp = 0 
                 self.o_arm1JogSpeed  = 0 
                 self.o_arm1gear = 0 
                 self.o_arm1MicroStep = 0 
-                self.o_deltaData6  = 0 
-                self.o_deltaData7  = 0 
-                self.o_deltaData8  = 0 
+                self.o_xTestPos  = 0 
+                self.o_yTestPos  = 0 
+                self.o_zTestPos  = 0 
                 self.o_deltaData9  = 0 
                 self.o_deltaData10 = 0 
                 self.o_arm2RunSpeed = 0 
@@ -109,10 +112,10 @@ class plc_map():
                 self.o_arm2gear = 0 
                 self.o_arm2MicroStep = 0 
                 self.o_deltaData16 = 0 
-                self.o_deltaData17 = 0 
-                self.o_deltaData18 = -1
-                self.o_deltaData19 = -1
-                self.o_deltaData20 = -1
+                self.o_RadiusBase = 0 
+                self.o_RadiusEE = -1
+                self.o_BicepLength = -1
+                self.o_ForeArmLength = -1
                 self.o_arm3RunSpeed  = -1 
                 self.o_arm3Ramp  = -1 
                 self.o_arm3JogSpeed  = -1 
@@ -132,7 +135,7 @@ class plc_map():
                 self.o_zPitchClass  = -1 
                 self.o_yPitchClass  = -1 
                 self.o_xClass1  = -1 
-                self.o_deltaData40  = -1 
+                self.o_yClass1  = -1 
         #initial PLC to PC data:
         def MakeReadArray(self):
 
@@ -233,7 +236,7 @@ class plc_map():
                 self.o_Bit[2][7] = self.o_deltabit2_7
 
                 self.o_Bit[3][0] = self.o_AllHome
-                self.o_Bit[3][1] = self.o_deltabit3_1
+                self.o_Bit[3][1] = self.o_AllMove
                 self.o_Bit[3][2] = self.o_deltabit3_2
                 self.o_Bit[3][3] = self.o_deltabit3_3
                 self.o_Bit[3][4] = self.o_deltabit3_4
@@ -249,9 +252,9 @@ class plc_map():
                 self.o_Data[3] = self.o_arm1JogSpeed 
                 self.o_Data[4] = self.o_arm1gear
                 self.o_Data[5] = self.o_arm1MicroStep
-                self.o_Data[6] = self.o_deltaData6 
-                self.o_Data[7] = self.o_deltaData7 
-                self.o_Data[8] = self.o_deltaData8 
+                self.o_Data[6] = self.o_xTestPos 
+                self.o_Data[7] = self.o_yTestPos 
+                self.o_Data[8] = self.o_zTestPos 
                 self.o_Data[9] = self.o_deltaData9 
                 self.o_Data[10] = self.o_deltaData10
 
@@ -261,10 +264,10 @@ class plc_map():
                 self.o_Data[14] = self.o_arm2gear
                 self.o_Data[15] = self.o_arm2MicroStep
                 self.o_Data[16] = self.o_deltaData16
-                self.o_Data[17] = self.o_deltaData17
-                self.o_Data[18] = self.o_deltaData18
-                self.o_Data[19] = self.o_deltaData19
-                self.o_Data[20] = self.o_deltaData20
+                self.o_Data[17] = self.o_RadiusBase
+                self.o_Data[18] = self.o_RadiusEE
+                self.o_Data[19] = self.o_BicepLength
+                self.o_Data[20] = self.o_ForeArmLength
 
                 self.o_Data[21] = self.o_arm3RunSpeed
                 self.o_Data[22] = self.o_arm3Ramp
@@ -286,6 +289,6 @@ class plc_map():
                 self.o_Data[37] = self.o_zPitchClass
                 self.o_Data[38] = self.o_yPitchClass
                 self.o_Data[39] = self.o_xClass1
-                self.o_Data[40] = self.o_deltaData40
+                self.o_Data[40] = self.o_yClass1
 
 

@@ -20,6 +20,8 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.btnPlcConnect.clicked.connect(self.connect_plc)
         self.btnPlcDisconnect.clicked.connect(self.disconnect_plc)
         self.btnSaveTeaching.clicked.connect(self.teaching_save)
+        self.btnAllMove.clicked.connect(self.Movetest)
+
 
         self.plc = None
         self.timer = QTimer()
@@ -64,14 +66,14 @@ class Widget(QWidget, Ui_wgDelta_Control):
                 "micro_step": self.lineArm1MicroStepMode,
             },
             "arm2": {
-                "run_speed": self.lineArm2RunSpeed,
+                
                 "ramp": self.lineArm2Ramp,
                 "jog_speed": self.lineArm2JogSpeed,
                 "gear_ratio": self.lineArm2Gear,
                 "micro_step": self.lineArm2MicroStepMode,
             },
             "arm3": {
-                "run_speed": self.lineArm3RunSpeed,
+                
                 "ramp": self.lineArm3Ramp,
                 "jog_speed": self.lineArm3JogSpeed,
                 "gear_ratio": self.lineArm3Gear,
@@ -88,7 +90,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
             },
             "conveyor": {
                 "speed": self.lineConvSpeed,
-                "ramp": self.lineConvRamp,
+                
             }
         }
 
@@ -130,7 +132,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
             print("No PLC connection to disconnect.")
 
     def polling_data(self):
-        if self.plc is None:
+        if self.plc is None or not self.plc.client.connected:
             self.lblConnectStatus.setText("No Connection")
             return
         
@@ -157,6 +159,8 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_Arm3JogBw = self.btnArm3JogBw.isDown()
 
         self.plc.o_AllHome = self.btnAllHome.isDown()
+        self.plc.o_AllMove = self.btnAllMove.isDown()
+
 
         # Write data logic
         def s_int(edit): return int(edit.text() or 0)
@@ -167,29 +171,17 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_arm1gear = s_int(self.lineArm1Gear)
         self.plc.o_arm1MicroStep = s_int(self.lineArm1MicroStepMode)
 
-        self.plc.o_arm2RunSpeed = s_int(self.lineArm2RunSpeed)
         self.plc.o_arm2Ramp = s_int(self.lineArm2Ramp)
         self.plc.o_arm2JogSpeed = s_int(self.lineArm2JogSpeed)
         self.plc.o_arm2gear = s_int(self.lineArm2Gear)
         self.plc.o_arm2MicroStep = s_int(self.lineArm2MicroStepMode)
 
-        self.plc.o_arm3RunSpeed = s_int(self.lineArm3RunSpeed)
         self.plc.o_arm3Ramp = s_int(self.lineArm3Ramp)
         self.plc.o_arm3JogSpeed = s_int(self.lineArm3JogSpeed)
         self.plc.o_arm3gear = s_int(self.lineArm3Gear)
         self.plc.o_arm3MicroStep = s_int(self.lineArm3MicroStepMode)
 
         self.plc.o_ConvRunSpeed = s_int(self.lineConvSpeed)
-        self.plc.o_ConvRamp = s_int(self.lineConvRamp)
-
-        self.plc.o_zPrePick = s_int(self.lineZPrepick)
-        self.plc.o_zClass = s_int(self.lineZClass)
-        self.plc.o_zPitchClass = s_int(self.lineZPitchClass)
-        self.plc.o_yPitchClass = s_int(self.lineYPitchClass1)
-
-        self.plc.o_xClass1 = s_int(self.lineXClass1)
-        self.plc.o_yClass1 = s_int(self.lineYClass1)
-
 
         self.plc.Write_data()
 
@@ -201,18 +193,34 @@ class Widget(QWidget, Ui_wgDelta_Control):
         
         def s_int(edit): return int(edit.text() or 0)
 
-        self.plc.o_deltaData20 = s_int(self.lineZPrepick)
-        self.plc.o_deltaData21 = s_int(self.lineZoffsetPd)
-        self.plc.o_deltaData22 = s_int(self.lineZClass)
-        self.plc.o_deltaData23 = s_int(self.lineZPitchClass)
+        #Teaching
 
-        self.plc.o_deltaData24 = s_int(self.lineXClassRed)
-        self.plc.o_deltaData25 = s_int(self.lineYClassRed)
+        self.plc.o_zPrePick = s_int(self.lineZPrepick)
+        self.plc.o_zClass = s_int(self.lineZClass)
+        self.plc.o_zPitchClass = s_int(self.lineZPitchClass)
+        self.plc.o_yPitchClass = s_int(self.lineYPitchClass1)
 
-        self.plc.o_deltaData26 = s_int(self.lineXClassYel)
-        self.plc.o_deltaData27 = s_int(self.lineYClassYel)
+        self.plc.o_xClass1 = s_int(self.lineXClass1)
+        self.plc.o_yClass1 = s_int(self.lineYClass1)
 
-        self.plc.o_deltaData28 = s_int(self.lineXClassGrn)
-        self.plc.o_deltaData29 = s_int(self.lineYClassGrn)
+        #Parameters
+
+        self.plc.o_RadiusBase = s_int(self.lineBaseRadius)
+        self.plc.o_RadiusEE = s_int(self.lineEeRadius)  
+        self.plc.o_BicepLength = s_int(self.lineBicepLength)
+        self.plc.o_ForeArmLength = s_int(self.lineForeArmLength)
+
 
         # Implement teaching save logic here
+    def Movetest(self):
+        
+        if self.plc is None:
+            print("PLC is not connected, Connect PLC first!")
+            return
+        
+        def s_int(edit): return int(edit.text() or 0)
+
+        #Teaching
+        self.plc.o_xTestPos = s_int(self.lineXtestTarget)
+        self.plc.o_yTestPos = s_int(self.lineYtestTarget)
+        self.plc.o_zTestPos = s_int(self.lineZtestTarget)

@@ -4,31 +4,29 @@
     },
     "robot_params": {
         "Para": {
-            "RadiusBase": 75,
-            "RadiusEE": 24,
-            "BicepLength": 100,
-            "ForeArmLength": 300
+            "RadiusBase": 93,
+            "RadiusEE": 35,
+            "BicepLength": 165,
+            "ForeArmLength": 354
         },
         "arm1": {
-            "run_speed": 500,
+            "run_speed": 200,
             "ramp": 100,
-            "jog_speed": 200,
-            "gear_ratio": 10,
+            "jog_speed": 300,
+            "gear_ratio": 3,
             "micro_step": 16
         },
         "arm2": {
-            "run_speed": 500,
             "ramp": 100,
-            "jog_speed": 200,
-            "gear_ratio": 10,
+            "jog_speed": 300,
+            "gear_ratio": 3,
             "micro_step": 16
         },
         "arm3": {
-            "run_speed": 500,
             "ramp": 100,
             "jog_speed": 300,
-            "gear_ratio": 10,
-            "micro_step": 15
+            "gear_ratio": 3,
+            "micro_step": 16
         },
         "teaching": {
             "z_prepick": -12,
@@ -40,9 +38,8 @@
             "y_pitch_class1": 0
         },
         "conveyor": {
-            "speed": 300,
-            "ramp": 50
+            "speed": 300
         }
     },
-    "last_update": "2026-03-23 23:25:10"
+    "last_update": "2026-03-24 23:27:25"
 }
