@@ -1,12 +1,15 @@
 import datetime
+from typing import Any, Dict
 from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import QWidget
 from pyqt.Services.ui_widget import Ui_wgDelta_Control
-from com.plc_map import plc_map
 from pyqt.Services.config_load import ConfigManager
+from .plc_controller import PlcController
+from .vision_controller import VisionController
 
 class Widget(QWidget, Ui_wgDelta_Control):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("Delta Robot Control Panel")
@@ -23,12 +26,23 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.btnAllMove.clicked.connect(self.Movetest)
 
 
-        self.plc = None
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.polling_data)
-        self.timer.start(100)
+        self.plc_controller = PlcController()
+        self.vision_controller = VisionController()
+        self.video_timer = QTimer()
+        self.video_timer.timeout.connect(self.update_webcam_frame)
 
-    def save_config(self):
+        self.btnStart.clicked.connect(self.start_webcam)
+        self.btnStop.clicked.connect(self.stop_webcam)
+        self.btnReset.clicked.connect(self.reset_webcam)
+
+        self.Sync = QTimer()
+        self.CheckConnection = QTimer()
+        self.Sync.timeout.connect(self.polling_data)
+        self.CheckConnection.timeout.connect(self.check_plc_connection)
+        self.CheckConnection.start(1000)
+        self.Sync.start(50)
+
+    def save_config(self) -> None:
         mapping = self.get_ui_mapping()
         robot_params = {}
 
@@ -49,7 +63,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
         
         self.config_manager.save(config_data)
 
-    def get_ui_mapping(self):
+    def get_ui_mapping(self) -> dict[str, dict[str, Any]]:
         return {
 
             "Para": {
@@ -94,7 +108,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
             }
         }
 
-    def load_config(self):
+    def load_config(self) -> None:
         data = self.config_manager.load()
 
         if not data:
@@ -111,116 +125,186 @@ class Widget(QWidget, Ui_wgDelta_Control):
 
         self.lineIpPlc.setText(str(data.get("connection", {}).get("ip_plc", 0)))
 
-    def connect_plc(self):
+    def connect_plc(self) -> None:
         ip = self.lineIpPlc.text()
-        if self.plc is None:
-            try:
-                self.plc = plc_map(ip) 
-                print(f"Attempting to connect to {ip}")
-            except Exception as e:
-                print(f"Connection Error: {e}")
-                self.plc = None
+        self.lblConnectStatus.setText(f"Attempting to connect to {ip}")
+        success, message = self.plc_controller.connect(ip)
+        self.lblConnectStatus.setText(message)
+        if success:
+            print(f"Connected to {ip}")
         else:
-            print("Already connected to PLC.")
+            print(f"Connection Error: {message}")
 
-    def disconnect_plc(self):
-        if self.plc is not None:
-            self.plc.client.disconnect()
-            self.plc = None
-            print("Disconnected from PLC.")
-        else:
+    def disconnect_plc(self) -> None:
+        if not self.plc_controller.is_connected():
+            self.lblConnectStatus.setText("PLC is not connected")
             print("No PLC connection to disconnect.")
+            return
 
-    def polling_data(self):
-        if self.plc is None or not self.plc.client.connected:
+        self.plc_controller.disconnect()
+        self.lblConnectStatus.setText("Disconnected")
+        print("Disconnected from PLC.")
+
+    def polling_data(self) -> None:
+        if not self.plc_controller.is_connected():
             self.lblConnectStatus.setText("No Connection")
             return
-        
+
         self.lblConnectStatus.setText("Connected")
         self.updateUi()
         self.updatePlc()
-        
-    def updateUi(self):
-        self.plc.Read_data()
-        self.lineArm1CurPos.setText(str(self.plc.i_deltaData1))
-        self.lineArm2CurPos.setText(str(self.plc.i_deltaData2))
-        self.lineArm3CurPos.setText(str(self.plc.i_deltaData3))
 
-    def updatePlc(self):
+    def check_plc_connection(self) -> None:
+        if self.plc_controller.is_connected():
+            self.lblConnectStatus.setText("Connected")
+        else:
+            self.lblConnectStatus.setText("No Connection")
 
-        # Write bit logic 
-        self.plc.o_Arm1JogFw = self.btnArm1JogFw.isDown()
-        self.plc.o_Arm1JogBw = self.btnArm1JogBw.isDown()
-        
-        self.plc.o_Arm2JogFw = self.btnArm2JogFw.isDown()
-        self.plc.o_Arm2JogBw = self.btnArm2JogBw.isDown()
+    def _to_int(self, edit: Any) -> int:
+        return int(edit.text() or 0)
 
-        self.plc.o_Arm3JogFw = self.btnArm3JogFw.isDown()
-        self.plc.o_Arm3JogBw = self.btnArm3JogBw.isDown()
+    def _collect_output_values(self) -> dict[str, Any]:
+        return {
+            "o_Arm1JogFw": self.btnArm1JogFw.isDown(),
+            "o_Arm1JogBw": self.btnArm1JogBw.isDown(),
+            "o_Arm2JogFw": self.btnArm2JogFw.isDown(),
+            "o_Arm2JogBw": self.btnArm2JogBw.isDown(),
+            "o_Arm3JogFw": self.btnArm3JogFw.isDown(),
+            "o_Arm3JogBw": self.btnArm3JogBw.isDown(),
+            "o_AllHome": self.btnAllHome.isDown(),
+            "o_AllMove": self.btnAllMove.isDown(),
+            "o_arm1RunSpeed": self._to_int(self.lineArm1RunSpeed),
+            "o_arm1Ramp": self._to_int(self.lineArm1Ramp),
+            "o_arm1JogSpeed": self._to_int(self.lineArm1JogSpeed),
+            "o_arm1gear": self._to_int(self.lineArm1Gear),
+            "o_arm1MicroStep": self._to_int(self.lineArm1MicroStepMode),
+            "o_arm2Ramp": self._to_int(self.lineArm2Ramp),
+            "o_arm2JogSpeed": self._to_int(self.lineArm2JogSpeed),
+            "o_arm2gear": self._to_int(self.lineArm2Gear),
+            "o_arm2MicroStep": self._to_int(self.lineArm2MicroStepMode),
+            "o_arm3Ramp": self._to_int(self.lineArm3Ramp),
+            "o_arm3JogSpeed": self._to_int(self.lineArm3JogSpeed),
+            "o_arm3gear": self._to_int(self.lineArm3Gear),
+            "o_arm3MicroStep": self._to_int(self.lineArm3MicroStepMode),
+            "o_ConvRunSpeed": self._to_int(self.lineConvSpeed),
+        }
 
-        self.plc.o_AllHome = self.btnAllHome.isDown()
-        self.plc.o_AllMove = self.btnAllMove.isDown()
+    def _collect_teaching_values(self) -> dict[str, int]:
+        return {
+            "o_zPrePick": self._to_int(self.lineZPrepick),
+            "o_zClass": self._to_int(self.lineZClass),
+            "o_zPitchClass": self._to_int(self.lineZPitchClass),
+            "o_yPitchClass": self._to_int(self.lineYPitchClass1),
+            "o_xClass1": self._to_int(self.lineXClass1),
+            "o_yClass1": self._to_int(self.lineYClass1),
+        }
 
+    def _collect_parameters(self) -> dict[str, int]:
+        return {
+            "o_RadiusBase": self._to_int(self.lineBaseRadius),
+            "o_RadiusEE": self._to_int(self.lineEeRadius),
+            "o_BicepLength": self._to_int(self.lineBicepLength),
+            "o_ForeArmLength": self._to_int(self.lineForeArmLength),
+        }
 
-        # Write data logic
-        def s_int(edit): return int(edit.text() or 0)
+    def _collect_movetest_values(self) -> dict[str, int]:
+        return {
+            "o_xTestPos": self._to_int(self.lineXtestTarget),
+            "o_yTestPos": self._to_int(self.lineYtestTarget),
+            "o_zTestPos": self._to_int(self.lineZtestTarget),
+        }
 
-        self.plc.o_arm1RunSpeed = s_int(self.lineArm1RunSpeed)
-        self.plc.o_arm1Ramp = s_int(self.lineArm1Ramp)
-        self.plc.o_arm1JogSpeed = s_int(self.lineArm1JogSpeed)
-        self.plc.o_arm1gear = s_int(self.lineArm1Gear)
-        self.plc.o_arm1MicroStep = s_int(self.lineArm1MicroStepMode)
+    def log(self, message: Any) -> None:
+        print(message)
+        try:
+            self.pteLog.appendPlainText(str(message))
+        except Exception:
+            pass
 
-        self.plc.o_arm2Ramp = s_int(self.lineArm2Ramp)
-        self.plc.o_arm2JogSpeed = s_int(self.lineArm2JogSpeed)
-        self.plc.o_arm2gear = s_int(self.lineArm2Gear)
-        self.plc.o_arm2MicroStep = s_int(self.lineArm2MicroStepMode)
+    def start_webcam(self) -> None:
+        if self.video_timer.isActive():
+            return
 
-        self.plc.o_arm3Ramp = s_int(self.lineArm3Ramp)
-        self.plc.o_arm3JogSpeed = s_int(self.lineArm3JogSpeed)
-        self.plc.o_arm3gear = s_int(self.lineArm3Gear)
-        self.plc.o_arm3MicroStep = s_int(self.lineArm3MicroStepMode)
+        success, message = self.vision_controller.start()
+        self.lblVisionStatus.setText(message)
+        self.log(message)
 
-        self.plc.o_ConvRunSpeed = s_int(self.lineConvSpeed)
+        if success:
+            self.video_timer.start(30)
 
-        self.plc.Write_data()
+    def stop_webcam(self) -> None:
+        if self.video_timer.isActive():
+            self.video_timer.stop()
 
-    def teaching_save(self):
-        
-        if self.plc is None:
+        self.vision_controller.stop()
+        self.lblVisionStatus.setText("Webcam stopped")
+        self.log("Webcam stopped")
+
+    def reset_webcam(self) -> None:
+        self.stop_webcam()
+        self.lblWebcam.clear()
+        self.lblVisionStatus.setText("Webcam reset")
+
+    def update_webcam_frame(self) -> None:
+        frame = self.vision_controller.read_frame()
+        if frame is None:
+            self.lblVisionStatus.setText("No webcam frame")
+            self.stop_webcam()
+            return
+
+        annotated = self.vision_controller.annotate_frame(frame)
+        height, width, channel = annotated.shape
+        bytes_per_line = channel * width
+        image = QImage(
+            annotated.data,
+            width,
+            height,
+            bytes_per_line,
+            QImage.Format.Format_BGR888,
+        )
+        pixmap = QPixmap.fromImage(image)
+        self.lblWebcam.setPixmap(
+            pixmap.scaled(
+                self.lblWebcam.size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+        )
+
+    def updateUi(self) -> None:
+        try:
+            positions = self.plc_controller.read_positions()
+            self.lineArm1CurPos.setText(str(positions.get("arm1", 0)))
+            self.lineArm2CurPos.setText(str(positions.get("arm2", 0)))
+            self.lineArm3CurPos.setText(str(positions.get("arm3", 0)))
+        except Exception:
+            pass
+
+    def updatePlc(self) -> None:
+        if not self.plc_controller.is_connected():
+            return
+
+        try:
+            self.plc_controller.write_outputs(self._collect_output_values())
+        except Exception:
+            pass
+
+    def teaching_save(self) -> None:
+        if not self.plc_controller.is_connected():
             print("PLC is not connected, Connect PLC first!")
             return
-        
-        def s_int(edit): return int(edit.text() or 0)
 
-        #Teaching
-
-        self.plc.o_zPrePick = s_int(self.lineZPrepick)
-        self.plc.o_zClass = s_int(self.lineZClass)
-        self.plc.o_zPitchClass = s_int(self.lineZPitchClass)
-        self.plc.o_yPitchClass = s_int(self.lineYPitchClass1)
-
-        self.plc.o_xClass1 = s_int(self.lineXClass1)
-        self.plc.o_yClass1 = s_int(self.lineYClass1)
-
-        #Parameters
-
-        self.plc.o_RadiusBase = s_int(self.lineBaseRadius)
-        self.plc.o_RadiusEE = s_int(self.lineEeRadius)  
-        self.plc.o_BicepLength = s_int(self.lineBicepLength)
-        self.plc.o_ForeArmLength = s_int(self.lineForeArmLength)
-
-
-        # Implement teaching save logic here
-    def Movetest(self):
-        
-        if self.plc is None:
+        try:
+            self.plc_controller.write_teaching(self._collect_teaching_values())
+            self.plc_controller.write_parameters(self._collect_parameters())
+        except Exception as e:
+            print(f"Teaching save error: {e}")
+    def Movetest(self) -> None:
+        if not self.plc_controller.is_connected():
             print("PLC is not connected, Connect PLC first!")
             return
-        
-        def s_int(edit): return int(edit.text() or 0)
 
-        #Teaching
-        self.plc.o_xTestPos = s_int(self.lineXtestTarget)
-        self.plc.o_yTestPos = s_int(self.lineYtestTarget)
-        self.plc.o_zTestPos = s_int(self.lineZtestTarget)
+        try:
+            self.plc_controller.write_outputs(self._collect_movetest_values())
+        except Exception as e:
+            print(f"Movetest error: {e}")
