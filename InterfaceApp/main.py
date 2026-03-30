@@ -1,7 +1,10 @@
 import sys
+
+import onnxruntime
+
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt, QTimer
-from pyqt.comUiPlc import Widget
+from pyqt.Application import Widget
 from com.plc_map import plc_map
 
 app = QtWidgets.QApplication(sys.argv)

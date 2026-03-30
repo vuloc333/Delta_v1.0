@@ -3,7 +3,6 @@ from snap7.util import get_bool, get_int, set_bool, set_int
 import numpy as np
 from typing import Any, Optional
 
-
 class plc_map:
     def __init__(self, ip_address: str) -> None:
         super().__init__()
@@ -25,11 +24,20 @@ class plc_map:
 
     def connect(self, ip_address: str) -> None:
         try:
-            self.client.connect(ip_address, 0, 1)
+            self.client.connect(Timeout = 0.5)
+            self.client.connect(ip_address, 0, 1)    
         except Exception as exc:
             raise ConnectionError(f"PLC connect failed: {exc}")
         print("Connect successfully!")
         
+    def is_connected(self) -> bool:
+        try:
+            if self.client.get_connected():
+                return True
+            else:                
+                return False
+        except:
+            return False
     def disconnect(self) -> None:
         try:
             self.client.disconnect()
@@ -37,10 +45,6 @@ class plc_map:
             pass
 
     def Read_data(self) -> None:
-        try:
-            self.client.get_connected()
-        except Exception:
-            return
 
         data_read = self.client.db_read(self.read_db_number, 0, self.dbLength)
         self._decode_input_bits(data_read)
@@ -48,11 +52,7 @@ class plc_map:
         self.MakeReadArray()
 
     def Write_data(self) -> None:
-        try:
-            self.client.get_connected()
-        except Exception:
-            return
-
+        
         self.MakeWriteArray()
         write_data = bytearray(self.dbLength)
 
@@ -72,6 +72,7 @@ class plc_map:
         self.o_Arm1JogFw = 0
         self.o_Arm1JogBw = 0
         self.o_Arm1Home = 0
+        
         self.o_deltabit0_3 = 0
         self.o_deltabit0_4 = 0
         self.o_deltabit0_5 = 0
@@ -93,9 +94,11 @@ class plc_map:
         self.o_deltabit2_5 = 0
         self.o_deltabit2_6 = 0
         self.o_deltabit2_7 = 0
+
         self.o_AllHome = 0
         self.o_AllMove = 0
-        self.o_deltabit3_2 = 0
+        self.o_visionReady = 0
+
         self.o_deltabit3_3 = 0
         self.o_deltabit3_4 = 0
         self.o_deltabit3_5 = 0
@@ -103,40 +106,49 @@ class plc_map:
         self.o_deltabit3_7 = 0
 
         # Data outputs
+        #Arm1
         self.o_arm1RunSpeed = 0
         self.o_arm1Ramp = 0
         self.o_arm1JogSpeed = 0
         self.o_arm1gear = 0
         self.o_arm1MicroStep = 0
+        #Test
         self.o_xTestPos = 0
         self.o_yTestPos = 0
         self.o_zTestPos = 0
         self.o_deltaData9 = 0
         self.o_deltaData10 = 0
+        #Arm2
         self.o_arm2RunSpeed = 0
         self.o_arm2Ramp = 0
         self.o_arm2JogSpeed = 0
         self.o_arm2gear = 0
         self.o_arm2MicroStep = 0
+        #Parameters
         self.o_deltaData16 = 0
         self.o_RadiusBase = 0
         self.o_RadiusEE = -1
         self.o_BicepLength = -1
         self.o_ForeArmLength = -1
+        #Arm3
         self.o_arm3RunSpeed = -1
         self.o_arm3Ramp = -1
         self.o_arm3JogSpeed = -1
         self.o_arm3gear = -1
         self.o_arm3MicroStep = -1
-        self.o_deltaData26 = -1
-        self.o_deltaData27 = -1
-        self.o_deltaData28 = -1
-        self.o_deltaData29 = -1
+        #Vision
+        self.o_visionObjectX = -1        # Object X coordinate
+        self.o_visionObjectY = -1        # Object Y coordinate  
+        self.o_visionObjectType = -1      # Object type (1=yellow, 2=red, 3=blue)
+        self.o_visionEncoder = -1    
+
         self.o_deltaData30 = -1
+        #Conveyor
         self.o_ConvRunSpeed = -1
         self.o_ConvRamp = -1
         self.o_deltaData33 = -1
-        self.o_deltaData34 = -1
+        self.o_deltaData34 = -1 
+        #Pick & Place
         self.o_zPrePick = -1
         self.o_zClass = -1
         self.o_zPitchClass = -1
@@ -156,7 +168,7 @@ class plc_map:
                 self.i_Data[numarr] = get_int(data_read, i)
 
     def MakeReadArray(self) -> None:
-        self.i_deltabit0_0 = self.i_Bit[0][0]
+        self.i_autoModeReady = self.i_Bit[0][0]
         self.i_deltabit0_1 = self.i_Bit[0][1]
         self.i_deltabit0_2 = self.i_Bit[0][2]
         self.i_deltabit0_3 = self.i_Bit[0][3]
@@ -180,10 +192,12 @@ class plc_map:
         self.i_deltabit2_5 = self.i_Bit[2][5]
         self.i_deltabit2_6 = self.i_Bit[2][6]
         self.i_deltabit2_7 = self.i_Bit[2][7]
+        
+        # Vision system inputs
 
-        self.i_deltaData1 = self.i_Data[1]
-        self.i_deltaData2 = self.i_Data[2]
-        self.i_deltaData3 = self.i_Data[3]
+        self.i_Arm1CurPos = self.i_Data[1]
+        self.i_Arm2CurPos = self.i_Data[2]
+        self.i_Arm3CurPos = self.i_Data[3]
         self.i_deltaData4 = self.i_Data[4]
         self.i_deltaData5 = self.i_Data[5]
         self.i_deltaData6 = self.i_Data[6]
@@ -191,7 +205,7 @@ class plc_map:
         self.i_deltaData8 = self.i_Data[8]
         self.i_deltaData9 = self.i_Data[9]
         self.i_deltaData10 = self.i_Data[10]
-        self.i_deltaData11 = self.i_Data[11]
+        self.i_CurrentEncoder = self.i_Data[11]
         self.i_deltaData12 = self.i_Data[12]
         self.i_deltaData13 = self.i_Data[13]
         self.i_deltaData14 = self.i_Data[14]
@@ -252,13 +266,13 @@ class plc_map:
 
         self.o_Bit[3][0] = self.o_AllHome
         self.o_Bit[3][1] = self.o_AllMove
-        self.o_Bit[3][2] = self.o_deltabit3_2
+        self.o_Bit[3][2] = self.o_visionReady  
         self.o_Bit[3][3] = self.o_deltabit3_3
         self.o_Bit[3][4] = self.o_deltabit3_4
         self.o_Bit[3][5] = self.o_deltabit3_5
         self.o_Bit[3][6] = self.o_deltabit3_6
         self.o_Bit[3][7] = self.o_deltabit3_7
-
+        #arm1
         self.o_Data[1] = self.o_arm1RunSpeed
         self.o_Data[2] = self.o_arm1Ramp
         self.o_Data[3] = self.o_arm1JogSpeed
@@ -269,7 +283,7 @@ class plc_map:
         self.o_Data[8] = self.o_zTestPos
         self.o_Data[9] = self.o_deltaData9
         self.o_Data[10] = self.o_deltaData10
-
+        #arm2
         self.o_Data[11] = self.o_arm2RunSpeed
         self.o_Data[12] = self.o_arm2Ramp
         self.o_Data[13] = self.o_arm2JogSpeed
@@ -280,16 +294,17 @@ class plc_map:
         self.o_Data[18] = self.o_RadiusEE
         self.o_Data[19] = self.o_BicepLength
         self.o_Data[20] = self.o_ForeArmLength
-
+        #arm3
         self.o_Data[21] = self.o_arm3RunSpeed
         self.o_Data[22] = self.o_arm3Ramp
         self.o_Data[23] = self.o_arm3JogSpeed
         self.o_Data[24] = self.o_arm3gear
         self.o_Data[25] = self.o_arm3MicroStep
-        self.o_Data[26] = self.o_deltaData26
-        self.o_Data[27] = self.o_deltaData27
-        self.o_Data[28] = self.o_deltaData28
-        self.o_Data[29] = self.o_deltaData29
+        #vision
+        self.o_Data[26] = self.o_visionObjectX
+        self.o_Data[27] = self.o_visionObjectY
+        self.o_Data[28] = self.o_visionObjectType
+        self.o_Data[29] = self.o_visionEncoder
         self.o_Data[30] = self.o_deltaData30
 
         self.o_Data[31] = self.o_ConvRunSpeed

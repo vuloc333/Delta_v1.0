@@ -29,17 +29,26 @@
             "micro_step": 16
         },
         "teaching": {
-            "z_prepick": -12,
-            "z_offset_pd": -50,
-            "z_class": -100,
-            "z_pitch_class": 10,
-            "x_class1": 0,
-            "y_class1": 0,
+            "z_prepick": -410,
+            "z_offset_pd": -415,
+            "z_class": 30,
+            "z_pitch_class": -450,
+            "x_class1": 50,
+            "y_class1": -50,
             "y_pitch_class1": 0
         },
         "conveyor": {
-            "speed": 300
+            "speed": 1500
         }
     },
-    "last_update": "2026-03-29 18:23:37"
+    "vision": {
+        "roi_x": 279,
+        "roi_y": 132,
+        "roi_w": 70,
+        "roi_h": 139,
+        "offset_cam_x": 0,
+        "offset_cam_y": 0,
+        "rate_pixel": 1
+    },
+    "last_update": "2026-03-31 01:02:14"
 }
