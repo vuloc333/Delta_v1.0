@@ -29,17 +29,6 @@ class VisionPlcHandler(QObject):
         self.timer = QTimer()
         self.timer.timeout.connect(self.run_cycle)
         
-    def start(self):
-        """Bắt đầu chu trình"""
-        self.step = Step.WAIT_PLC
-        self.timer.start(50)  # 20Hz
-        self.status.emit("Auto cycle started")
-        
-    def stop(self):
-        """Dừng chu trình"""
-        self.timer.stop()
-        self.status.emit("Auto cycle stopped")
-        
     def is_running(self):
         return self.timer.isActive()
         
@@ -64,7 +53,7 @@ class VisionPlcHandler(QObject):
             self.status.emit("PLC ready, verifying object...")
             self.detection_buffer.clear()
             self.step = Step.VERIFY_OBJ
-            
+        self.status.emit("Waiting for PLC...")
     def _step_verify(self):
         """Step 2: Kiểm tra 10 khung hình để xác nhận (cần 7/10 đúng)"""
         from collections import Counter

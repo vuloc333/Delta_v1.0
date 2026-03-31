@@ -1,8 +1,13 @@
 """Vision Control - Simple YOLO detection for PyQt"""
 import cv2
+import os
+import time
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from ultralytics import YOLO
+
+# Chặn warning MSMF từ OpenCV
+os.environ['OPENCV_VIDEOIO_PRIORITY_MSMF'] = '0'
 
 
 class VisionProcessor(QThread):
@@ -43,14 +48,22 @@ class VisionProcessor(QThread):
             return False
     
     def init_camera(self):
-        """Mở camera"""
-        self.cap = cv2.VideoCapture(self.camera_id)
+        """Mở camera - dùng DSHOW backend (ổn định hơn MSMF)"""
+        self.cap = cv2.VideoCapture(self.camera_id, cv2.CAP_DSHOW)
         if self.cap.isOpened():
             self.frame_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             self.frame_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             print(f"Camera: {self.frame_width}x{self.frame_height}")
             return True
         return False
+    
+    def restart_camera(self):
+        """Khởi động lại camera khi gặp lỗi"""
+        print("Restarting camera...")
+        if self.cap:
+            self.cap.release()
+        time.sleep(0.5)
+        return self.init_camera()
     
     def set_roi(self, x, y, w, h):
         """Set ROI region"""
@@ -100,12 +113,6 @@ class VisionProcessor(QThread):
         # Vẽ ROI border
         cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
         
-        # Cache detection results
-        if detections:
-            self.detection_buffer.append(detections)
-        else:
-            self.detection_buffer.clear()
-        
         return frame, detections
         
     def frame_to_pixmap(self, frame):
@@ -119,21 +126,18 @@ class VisionProcessor(QThread):
         return QPixmap.fromImage(qt_image)
         
     def run(self):
-        """Main loop"""
         if not self.load_model() or not self.init_camera():
             return
-        
         self.running = True
         while self.running:
             ret, frame = self.cap.read()
-            if not ret:
-                continue
-            
-            annotated, dets = self.detect(frame)
-            self.detections = dets
-            self.frame_ready.emit(annotated, dets)
+            if ret and frame is not None:
+                annotated, dets = self.detect(frame)
+                self.detections = dets
+                self.frame_ready.emit(annotated, dets)
+            else:
+                self.restart_camera()
             self.msleep(33)
-        
         self.cap.release()
     
     def stop(self):

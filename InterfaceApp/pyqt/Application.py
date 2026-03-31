@@ -42,8 +42,10 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.VisionUpdate = QTimer()
         
         self.Sync.timeout.connect(self.polling_data)
+        self.Sync.timeout.connect(self.start_auto_cycle)
         self.CheckConnection.timeout.connect(self.check_plc_connection)
         self.VisionUpdate.timeout.connect(self.update_vision_status)
+
          
         self.CheckConnection.start(2000)
         self.Sync.start(30)
@@ -68,35 +70,40 @@ class Widget(QWidget, Ui_wgDelta_Control):
             
     def _setup_roi(self):
         """Setup ROI khi camera đã sẵn sàng"""
-        if self.vision and self.vision.is_ready():
-            self.init_timer.stop()
-            
-            # Lấy kích thước frame từ camera
-            w, h = self.vision.get_frame_size()
-            print(f"Camera size: {w}x{h}")
-            
-            # Cấu hình ROI sliders
-            self.slideRoiX.setRange(0, w - 1)
-            self.slideRoiY.setRange(0, h - 1)
-            self.slideRoiW.setRange(1, w)
-            self.slideRoiH.setRange(1, h)
-            
-            # Set giá trị mặc định (full frame)
-            self.slideRoiX.setValue(0)
-            self.slideRoiY.setValue(0)
-            self.slideRoiW.setValue(w)
-            self.slideRoiH.setValue(h)
-            
-            # Connect ROI sliders
-            self.slideRoiX.valueChanged.connect(self.update_roi)
-            self.slideRoiY.valueChanged.connect(self.update_roi)
-            self.slideRoiW.valueChanged.connect(self.update_roi)
-            self.slideRoiH.valueChanged.connect(self.update_roi)
-            
-            # Load config ROI
-            self._load_vision_config()
-            
-            print("ROI setup complete")
+        try:
+            if self.vision and self.vision.is_ready():
+                self.init_timer.stop()
+                pass
+            else: 
+                return
+        except:
+            return
+        # Lấy kích thước frame từ camera
+        w, h = self.vision.get_frame_size()
+        self.log(f"Camera size: {w}x{h}")
+        
+        # Cấu hình ROI sliders
+        self.slideRoiX.setRange(0, w - 1)
+        self.slideRoiY.setRange(0, h - 1)
+        self.slideRoiW.setRange(1, w)
+        self.slideRoiH.setRange(1, h)
+        
+        # Set giá trị mặc định (full frame)
+        self.slideRoiX.setValue(0)
+        self.slideRoiY.setValue(0)
+        self.slideRoiW.setValue(w)
+        self.slideRoiH.setValue(h)
+        
+        # Connect ROI sliders
+        self.slideRoiX.valueChanged.connect(self.update_roi)
+        self.slideRoiY.valueChanged.connect(self.update_roi)
+        self.slideRoiW.valueChanged.connect(self.update_roi)
+        self.slideRoiH.valueChanged.connect(self.update_roi)
+        
+        # Load config ROI
+        self._load_vision_config()
+        
+        print("ROI setup complete")
             
     def update_roi(self):
         """Update ROI từ sliders"""
@@ -219,7 +226,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
             return
         
         if not data:
-            print("No config file found or file is empty.")
+            self.log("No config file found or file is empty.")
             return
 
         rp_data = data.get("robot_params", {})
@@ -235,7 +242,6 @@ class Widget(QWidget, Ui_wgDelta_Control):
                     widget.setText(str(arm_data.get(param_key, 0)))
     
         self.lineIpPlc.setText(str(data.get("connection", {}).get("ip_plc", "")))
-
     # endregion
     
     # region PLC Connection
@@ -245,9 +251,12 @@ class Widget(QWidget, Ui_wgDelta_Control):
             self.plc = plc_map(ip)
             # Initialize PLC controller after connection
             self.lblConnectStatus.setText("Connected")
+            self.teaching_save()
+
         except Exception as exc:
             self.lblConnectStatus.setText("Connect failed")
             self.log(f"connect_plc error: {exc}")
+
 
     def disconnect_plc(self) -> None:
         try:
@@ -278,7 +287,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
     def _to_int(self, edit: Any) -> int:
         return int(edit.text() or 0)
 
-    def _collect_output_values(self) -> None:
+    def _collect_ui_values(self) -> None:
         # update bit
         self.plc.o_Arm1JogFw = self.btnArm1JogFw.isDown()
         self.plc.o_Arm1JogBw = self.btnArm1JogBw.isDown()
@@ -288,6 +297,10 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_Arm3JogBw = self.btnArm3JogBw.isDown()
         self.plc.o_AllHome = self.btnAllHome.isDown()
         self.plc.o_AllMove = self.btnAllMove.isDown()
+
+        self.plc.o_Startbtn = self.btnStart.isDown()
+        self.plc.o_Stopbtn = self.btnStop.isDown()
+        self.plc.o_ResetBtn = self.btnReset.isDown()
 
         # update data
         self.plc.o_arm1RunSpeed = self._to_int(self.lineArm1RunSpeed)
@@ -309,23 +322,24 @@ class Widget(QWidget, Ui_wgDelta_Control):
         try:
             if self.plc.is_connected():
                 pass
+            else:
+                return
         except:
             return
-        
-        self.lblConnectStatus.setText("Connected")
+
         self.updateUi()
         self.updatePlc()
 
     def updateUi(self) -> None:
 
         self.plc.Read_data()
-        self.lineArm1CurPos.setText(str(self.plc.i_deltaData1))
-        self.lineArm2CurPos.setText(str(self.plc.i_deltaData2))
-        self.lineArm3CurPos.setText(str(self.plc.i_deltaData3))
+        self.lineArm1CurPos.setText(str(self.plc.i_Arm1CurPos))
+        self.lineArm2CurPos.setText(str(self.plc.i_Arm2CurPos))
+        self.lineArm3CurPos.setText(str(self.plc.i_Arm3CurPos))
 
     def updatePlc(self) -> None:
 
-        self._collect_output_values()
+        self._collect_ui_values()
         self.plc.Write_data()
 
     def IK_Move(self) -> None:
@@ -352,6 +366,8 @@ class Widget(QWidget, Ui_wgDelta_Control):
         try:
             if self.plc.is_connected():
                 self.lblConnectStatus.setText("Connected")
+
+                self.log(self.plc.i_autoModeReady)
             else:
                 self.lblConnectStatus.setText("No Connection")
         except:
@@ -368,18 +384,20 @@ class Widget(QWidget, Ui_wgDelta_Control):
     # region Auto Cycle
     def start_auto_cycle(self):
         """Bắt đầu chu trình tự động PLC+Vision"""
-        if self.plc and self.vision:
+        try:
+            if self.plc and self.vision:
+                pass
+            else:
+                return
+        except:
+            return 
+
+        if not hasattr(self, 'vision_plc') or self.vision_plc is None:
             self.vision_plc = VisionPlcHandler(self.plc, self.vision)
-            self.vision_plc.status.connect(self.lblVisionStatus.setText)
-            self.vision_plc.start()
-            print("Auto cycle started")
-            
-    def stop_auto_cycle(self):
-        """Dừng chu trình tự động"""
-        if hasattr(self, 'vision_plc') and self.vision_plc:
-            self.vision_plc.stop()
-            print("Auto cycle stopped")
-    # endregion
+
+        self.vision_plc.status.connect(self.lblRobotStatus.setText)
+        self.vision_plc.run_cycle()
+    #endregion
     
     def log(self, message: Any) -> None:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

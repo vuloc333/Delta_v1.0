@@ -24,7 +24,7 @@ class plc_map:
 
     def connect(self, ip_address: str) -> None:
         try:
-            self.client.connect(Timeout = 0.5)
+            # Set timeout để tránh đơ khi không kết nối được (ms)
             self.client.connect(ip_address, 0, 1)    
         except Exception as exc:
             raise ConnectionError(f"PLC connect failed: {exc}")
@@ -45,27 +45,35 @@ class plc_map:
             pass
 
     def Read_data(self) -> None:
-
-        data_read = self.client.db_read(self.read_db_number, 0, self.dbLength)
-        self._decode_input_bits(data_read)
-        self._decode_input_data(data_read)
-        self.MakeReadArray()
-
+        try:
+            if not self.is_connected():
+                return
+            data_read = self.client.db_read(self.read_db_number, 0, self.dbLength)
+            self._decode_input_bits(data_read)
+            self._decode_input_data(data_read)
+            self.MakeReadArray()
+        except Exception as e:
+            print(f"Read_data error: {e}")
+            
     def Write_data(self) -> None:
-        
-        self.MakeWriteArray()
-        write_data = bytearray(self.dbLength)
+        try:
+            if not self.is_connected():
+                return
+            self.MakeWriteArray()
+            write_data = bytearray(self.dbLength)
 
-        for i in range(self.byteofBit):
-            for j in range(8):
-                set_bool(write_data, i, j, bool(self.o_Bit[i, j]))
+            for i in range(self.byteofBit):
+                for j in range(8):
+                    set_bool(write_data, i, j, bool(self.o_Bit[i, j]))
 
-        for i in range(self.startData, self.dbLength - 1, 2):
-            numarr = (i - self.startData) // 2 + 1
-            if 0 <= numarr < len(self.o_Data):
-                set_int(write_data, i, int(self.o_Data[numarr]))
+            for i in range(self.startData, self.dbLength - 1, 2):
+                numarr = (i - self.startData) // 2 + 1
+                if 0 <= numarr < len(self.o_Data):
+                    set_int(write_data, i, int(self.o_Data[numarr]))
 
-        self.client.db_write(self.write_db_number, 0, write_data)
+            self.client.db_write(self.write_db_number, 0, write_data)
+        except Exception as e:
+            print(f"Write_data error: {e}")
 
     def initWriteVar(self) -> None:
         # Bit outputs
@@ -73,9 +81,9 @@ class plc_map:
         self.o_Arm1JogBw = 0
         self.o_Arm1Home = 0
         
-        self.o_deltabit0_3 = 0
-        self.o_deltabit0_4 = 0
-        self.o_deltabit0_5 = 0
+        self.o_Startbtn = 0
+        self.o_Stopbtn = 0
+        self.o_ResetBtn = 0
         self.o_deltabit0_6 = 0
         self.o_deltabit0_7 = 0
         self.o_Arm2JogFw = 0
@@ -240,9 +248,9 @@ class plc_map:
         self.o_Bit[0][0] = self.o_Arm1JogFw
         self.o_Bit[0][1] = self.o_Arm1JogBw
         self.o_Bit[0][2] = self.o_Arm1Home
-        self.o_Bit[0][3] = self.o_deltabit0_3
-        self.o_Bit[0][4] = self.o_deltabit0_4
-        self.o_Bit[0][5] = self.o_deltabit0_5
+        self.o_Bit[0][3] = self.o_Startbtn
+        self.o_Bit[0][4] = self.o_Stopbtn
+        self.o_Bit[0][5] = self.o_ResetBtn
         self.o_Bit[0][6] = self.o_deltabit0_6
         self.o_Bit[0][7] = self.o_deltabit0_7
 
