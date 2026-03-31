@@ -41,14 +41,11 @@
             "speed": 1500
         }
     },
-    "vision": {
-        "roi_x": 279,
-        "roi_y": 132,
-        "roi_w": 70,
-        "roi_h": 139,
-        "offset_cam_x": 0,
-        "offset_cam_y": 0,
-        "rate_pixel": 1
+    "vision_roi": {
+        "x": 244,
+        "y": 39,
+        "w": 130,
+        "h": 274
     },
-    "last_update": "2026-03-31 01:02:14"
+    "last_update": "2026-03-31 23:24:34"
 }

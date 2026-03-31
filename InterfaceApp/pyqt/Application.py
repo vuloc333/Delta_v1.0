@@ -1,12 +1,13 @@
 import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QWidget
 from pyqt.Services.ui_widget import Ui_wgDelta_Control
 from pyqt.Services.config_load import ConfigManager
 from com.plc_map import plc_map
-from vision.vision_controller import VisionController
+from vision.vision_control import VisionControl
+from pyqt.comVisionPlc import VisionPlcHandler
 
 class Widget(QWidget, Ui_wgDelta_Control):
     def __init__(self) -> None:
@@ -17,11 +18,12 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.config_manager = ConfigManager("pyqt\\Services\\config.json")
         
         self.plc = None
+        self.vision = None
+        self.plc_vision = None
         
-        # Initialize Vision Controller for RX 470
-        self.vision = VisionController(self.lblWebcam, camera_id=1)
-        self.vision.start()
-
+        # Khởi tạo vision sau khi UI setup
+        self.init_vision()
+        
         self.load_config()
         # endregion
 
@@ -37,36 +39,99 @@ class Widget(QWidget, Ui_wgDelta_Control):
         # region Timers Setup
         self.Sync = QTimer()
         self.CheckConnection = QTimer()
-        self.VisionTimer = QTimer()  # Update vision status
+        self.VisionUpdate = QTimer()
+        
         self.Sync.timeout.connect(self.polling_data)
         self.CheckConnection.timeout.connect(self.check_plc_connection)
-        self.VisionTimer.timeout.connect(self.update_vision_status)
+        self.VisionUpdate.timeout.connect(self.update_vision_status)
          
         self.CheckConnection.start(2000)
         self.Sync.start(30)
-        self.VisionTimer.start(100)  # 10Hz update
+        self.VisionUpdate.start(100)  # 10Hz update vision status
         # endregion
     
-    def update_vision_status(self):
-        """Update vision status label"""
+    def init_vision(self):
+        """Khởi tạo vision system"""
         try:
-            if hasattr(self, 'vision'):
-                detections = self.vision.get_detections()
-                if detections:
-                    info = " | ".join([f"{d['class']}:{d['confidence']:.2f}" for d in detections])
-                    self.lblVisionStatus.setText(f"Detected: {info}")
-                else:
-                    self.lblVisionStatus.setText("No objects detected")
-        except:
-            pass
+            # 1. Khởi tạo vision control
+            self.vision = VisionControl(self.lblWebcam, camera_id=1)
+            self.vision.start()
+            
+            # 2. Timer đợi camera sẵn sàng rồi cấu hình ROI
+            self.init_timer = QTimer()
+            self.init_timer.timeout.connect(self._setup_roi)
+            self.init_timer.start(200)
+            
+            print("Vision initialized")
+        except Exception as e:
+            print(f"Vision init error: {e}")
+            
+    def _setup_roi(self):
+        """Setup ROI khi camera đã sẵn sàng"""
+        if self.vision and self.vision.is_ready():
+            self.init_timer.stop()
+            
+            # Lấy kích thước frame từ camera
+            w, h = self.vision.get_frame_size()
+            print(f"Camera size: {w}x{h}")
+            
+            # Cấu hình ROI sliders
+            self.slideRoiX.setRange(0, w - 1)
+            self.slideRoiY.setRange(0, h - 1)
+            self.slideRoiW.setRange(1, w)
+            self.slideRoiH.setRange(1, h)
+            
+            # Set giá trị mặc định (full frame)
+            self.slideRoiX.setValue(0)
+            self.slideRoiY.setValue(0)
+            self.slideRoiW.setValue(w)
+            self.slideRoiH.setValue(h)
+            
+            # Connect ROI sliders
+            self.slideRoiX.valueChanged.connect(self.update_roi)
+            self.slideRoiY.valueChanged.connect(self.update_roi)
+            self.slideRoiW.valueChanged.connect(self.update_roi)
+            self.slideRoiH.valueChanged.connect(self.update_roi)
+            
+            # Load config ROI
+            self._load_vision_config()
+            
+            print("ROI setup complete")
+            
+    def update_roi(self):
+        """Update ROI từ sliders"""
+        if self.vision:
+            x = self.slideRoiX.value()
+            y = self.slideRoiY.value()
+            w = self.slideRoiW.value()
+            h = self.slideRoiH.value()
+            self.vision.set_roi(x, y, w, h)
+            
+    def update_vision_status(self):
+        """Cập nhật trạng thái vision lên UI"""
+        if self.vision:
+            detections = self.vision.get_detections()
+            if detections:
+                info = " | ".join([f"{d.get('class', '?' )}({d.get('x', 0)},{d.get('y', 0)})" for d in detections])
+                self.lblVisionStatus.setText(info)
+            else:
+                self.lblVisionStatus.setText("No objects")
+                
+    def _load_vision_config(self):
+        """Load vision ROI từ config"""
+        try:
+            data = self.config_manager.load()
+            if data and "vision_roi" in data:
+                roi = data["vision_roi"]
+                self.slideRoiX.setValue(roi.get("x", 0))
+                self.slideRoiY.setValue(roi.get("y", 0))
+                self.slideRoiW.setValue(roi.get("w", 640))
+                self.slideRoiH.setValue(roi.get("h", 480))
+                self.update_roi()
+                print("Vision ROI loaded from config")
+        except Exception as e:
+            print(f"Load vision config error: {e}")
     
-    def closeEvent(self, event):
-        """Cleanup when closing"""
-        if hasattr(self, 'vision'):
-            self.vision.stop()
-        event.accept()
-    
-
     # region Save/Load Config
 
     def save_config(self) -> None:
@@ -88,6 +153,12 @@ class Widget(QWidget, Ui_wgDelta_Control):
             config_data = {
                 "connection": {"ip_plc": self.lineIpPlc.text()},
                 "robot_params": robot_params,
+                "vision_roi": {
+                    "x": self.slideRoiX.value(),
+                    "y": self.slideRoiY.value(),
+                    "w": self.slideRoiW.value(),
+                    "h": self.slideRoiH.value()
+                },
                 "last_update": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
@@ -286,6 +357,28 @@ class Widget(QWidget, Ui_wgDelta_Control):
         except:
             self.lblConnectStatus.setText("No Connection")
             return
+    # endregion
+    
+    def closeEvent(self, event):
+        """Cleanup khi đóng app"""
+        if self.vision:
+            self.vision.stop()
+        event.accept()
+        
+    # region Auto Cycle
+    def start_auto_cycle(self):
+        """Bắt đầu chu trình tự động PLC+Vision"""
+        if self.plc and self.vision:
+            self.vision_plc = VisionPlcHandler(self.plc, self.vision)
+            self.vision_plc.status.connect(self.lblVisionStatus.setText)
+            self.vision_plc.start()
+            print("Auto cycle started")
+            
+    def stop_auto_cycle(self):
+        """Dừng chu trình tự động"""
+        if hasattr(self, 'vision_plc') and self.vision_plc:
+            self.vision_plc.stop()
+            print("Auto cycle stopped")
     # endregion
     
     def log(self, message: Any) -> None:
