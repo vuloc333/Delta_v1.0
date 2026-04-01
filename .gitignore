@@ -7,15 +7,15 @@ venv/
 ENV/
 *.log
 
-# --- TIA Portal (Tia15_1) ---
+# --- TIA Portal (S7_1200_Program) ---
 # Loại bỏ các file tạm và file khóa gây lỗi "Permission denied"
-Tia15_1/IM/
-Tia15_1/Logs/
-Tia15_1/System/
-Tia15_1/UserFiles/
-Tia15_1/**/*.ldf
-Tia15_1/**/*.mdf
-Tia15_1/**/~*
+S7_1200_Program/IM/
+S7_1200_Program/Logs/
+S7_1200_Program/System/
+S7_1200_Program/UserFiles/
+S7_1200_Program/**/*.ldf
+S7_1200_Program/**/*.mdf
+S7_1200_Program/**/~*
 
 # --- YOLO & Vision ---
 # Nếu bạn có bộ dữ liệu ảnh nặng hoặc model đã train (.pt)
