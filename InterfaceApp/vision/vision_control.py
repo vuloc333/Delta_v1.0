@@ -37,7 +37,6 @@ class VisionProcessor(QThread):
         """Load YOLO model - tự động chọn device"""
         try:
             # Absolute path để tránh lỗi khi chạy từ folder khác
-            import os
             current_dir = os.path.dirname(os.path.abspath(__file__))
             model_path = os.path.join(current_dir, "runs", "detect", "train2", "weights", "best.pt")
             self.model = YOLO(model_path)
@@ -85,7 +84,7 @@ class VisionProcessor(QThread):
             return frame, []
         
         # YOLO detect
-        results = self.model(roi, verbose=False)
+        results = self.model.predict(roi, verbose=False, iou=0.3, conf=0.25)
         
         detections = []
         for r in results:
@@ -114,16 +113,6 @@ class VisionProcessor(QThread):
         cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
         
         return frame, detections
-        
-    def frame_to_pixmap(self, frame):
-        """Convert OpenCV frame to QPixmap"""
-        if frame is None:
-            return None
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb.shape
-        bytes_per_line = ch * w
-        qt_image = QImage(rgb.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-        return QPixmap.fromImage(qt_image)
         
     def run(self):
         if not self.load_model() or not self.init_camera():
@@ -169,7 +158,7 @@ class VisionControl:
             h, w, ch = rgb.shape
             img = QImage(rgb.data, w, h, ch*w, QImage.Format.Format_RGB888)
             pix = QPixmap.fromImage(img)
-            scaled = pix.scaled(self.label.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            scaled = pix.scaled(self.label.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
             self.label.setPixmap(scaled)
         except:
             pass

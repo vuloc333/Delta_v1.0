@@ -14,6 +14,7 @@ class Step(Enum):
 class VisionPlcHandler(QObject):
     """Xử lý chu trình Vision + PLC"""
     status = pyqtSignal(str)
+    log = pyqtSignal(str)
     
     def __init__(self, plc, vision):
         super().__init__()
@@ -31,6 +32,10 @@ class VisionPlcHandler(QObject):
         
     def is_running(self):
         return self.timer.isActive()
+    
+    def update_plc(self, plc):
+        """Cập nhật PLC reference mới khi reconnect"""
+        self.plc = plc
         
     def run_cycle(self):
         """Chu trình chính - match case"""
@@ -50,9 +55,9 @@ class VisionPlcHandler(QObject):
     def _step_wait_plc(self):
         """Step 1: Chờ PLC bit ON"""
         if self.plc.i_autoModeReady:
-            self.status.emit("PLC ready, verifying object...")
             self.detection_buffer.clear()
             self.step = Step.VERIFY_OBJ
+            self.log.emit("PLC ready, verifying object...")
         self.status.emit("Waiting for PLC...")
     def _step_verify(self):
         """Step 2: Kiểm tra 10 khung hình để xác nhận (cần 7/10 đúng)"""
@@ -111,16 +116,18 @@ class VisionPlcHandler(QObject):
         
         c = self.verified_object['class']
         x, y = self.verified_object['x'], self.verified_object['y']
-        self.status.emit(f"Sent {c}: X={x} Y={y}")
+        self.log.emit(f"Detected: {c}: X={x} Y={y}")
         self.step = Step.WAIT_COMPLETE
         
     def _step_wait_complete(self):
+        self.plc.o_visionReady = 1
         """Step 4: Chờ PLC xử lý xong (bit OFF), về step 1"""
         if not self.plc.i_autoModeReady:
             self.verified_object = None
             self.detection_buffer.clear()
-            self.status.emit("Cycle complete, waiting...")
             self.step = Step.WAIT_PLC
+            self.plc.o_visionReady = 0
+            self.log.emit("Detection complete, waiting for PLC...")
             
     def get_current_step(self):
         return self.step.name

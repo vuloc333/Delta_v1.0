@@ -12,30 +12,23 @@
         "arm1": {
             "run_speed": 1300,
             "ramp": 100,
-            "jog_speed": 300,
-            "gear_ratio": 3,
-            "micro_step": 16
+            "jog_speed": 300
         },
         "arm2": {
             "ramp": 100,
-            "jog_speed": 300,
-            "gear_ratio": 3,
-            "micro_step": 16
+            "jog_speed": 300
         },
         "arm3": {
             "ramp": 100,
-            "jog_speed": 300,
-            "gear_ratio": 3,
-            "micro_step": 16
+            "jog_speed": 300
         },
         "teaching": {
-            "z_prepick": -410,
+            "z_prepick": -400,
             "z_offset_pd": -415,
             "z_class": 30,
-            "z_pitch_class": -450,
             "x_class1": 50,
             "y_class1": -50,
-            "y_pitch_class1": 0
+            "y_pitch_class1": 50
         },
         "conveyor": {
             "speed": 1500
@@ -47,5 +40,10 @@
         "w": 130,
         "h": 274
     },
-    "last_update": "2026-04-01 01:59:44"
+    "vision_params": {
+        "offset_x": 313,
+        "offset_y": 155,
+        "pixel_rate": 11
+    },
+    "last_update": "2026-04-02 03:01:11"
 }

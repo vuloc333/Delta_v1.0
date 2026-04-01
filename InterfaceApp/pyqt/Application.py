@@ -39,17 +39,14 @@ class Widget(QWidget, Ui_wgDelta_Control):
         # region Timers Setup
         self.Sync = QTimer()
         self.CheckConnection = QTimer()
-        self.VisionUpdate = QTimer()
         
         self.Sync.timeout.connect(self.polling_data)
         self.Sync.timeout.connect(self.start_auto_cycle)
+        self.Sync.timeout.connect(self.update_vision_status)
         self.CheckConnection.timeout.connect(self.check_plc_connection)
-        self.VisionUpdate.timeout.connect(self.update_vision_status)
-
          
         self.CheckConnection.start(2000)
-        self.Sync.start(30)
-        self.VisionUpdate.start(100)  # 10Hz update vision status
+        self.Sync.start(80)
         # endregion
     
     def init_vision(self):
@@ -166,6 +163,11 @@ class Widget(QWidget, Ui_wgDelta_Control):
                     "w": self.slideRoiW.value(),
                     "h": self.slideRoiH.value()
                 },
+                "vision_params": {
+                    "offset_x": int(self.lineOffsetCamX.text() or 0),
+                    "offset_y": int(self.lineOffsetCamY.text() or 0),
+                    "pixel_rate": int(self.lineRatePixel.text() or 1)
+                },
                 "last_update": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
@@ -188,28 +190,21 @@ class Widget(QWidget, Ui_wgDelta_Control):
                 "run_speed": self.lineArm1RunSpeed,
                 "ramp": self.lineArm1Ramp,
                 "jog_speed": self.lineArm1JogSpeed,
-                "gear_ratio": self.lineArm1Gear,
-                "micro_step": self.lineArm1MicroStepMode,
             },
             "arm2": {
                 
                 "ramp": self.lineArm2Ramp,
                 "jog_speed": self.lineArm2JogSpeed,
-                "gear_ratio": self.lineArm2Gear,
-                "micro_step": self.lineArm2MicroStepMode,
             },
             "arm3": {
                 
                 "ramp": self.lineArm3Ramp,
                 "jog_speed": self.lineArm3JogSpeed,
-                "gear_ratio": self.lineArm3Gear,
-                "micro_step": self.lineArm3MicroStepMode,
             },
             "teaching": {
                 "z_prepick": self.lineZPrepick,
                 "z_offset_pd": self.lineZoffsetPd,
                 "z_class": self.lineZClass,
-                "z_pitch_class": self.lineZPitchClass,
                 "x_class1": self.lineXClass1,
                 "y_class1": self.lineYClass1,
                 "y_pitch_class1": self.lineYPitchClass1,
@@ -242,6 +237,12 @@ class Widget(QWidget, Ui_wgDelta_Control):
                     widget.setText(str(arm_data.get(param_key, 0)))
     
         self.lineIpPlc.setText(str(data.get("connection", {}).get("ip_plc", "")))
+        
+        # Load vision_params
+        vp_data = data.get("vision_params", {})
+        self.lineOffsetCamX.setText(str(vp_data.get("offset_x", 0)))
+        self.lineOffsetCamY.setText(str(vp_data.get("offset_y", 0)))
+        self.lineRatePixel.setText(str(vp_data.get("pixel_rate", 1)))
     # endregion
     
     # region PLC Connection
@@ -252,11 +253,14 @@ class Widget(QWidget, Ui_wgDelta_Control):
             # Initialize PLC controller after connection
             self.lblConnectStatus.setText("Connected")
             self.teaching_save()
+            
+            # Cập nhật PLC reference cho vision_plc nếu đang chạy
+            if hasattr(self, 'vision_plc') and self.vision_plc is not None:
+                self.vision_plc.update_plc(self.plc)
 
         except Exception as exc:
             self.lblConnectStatus.setText("Connect failed")
             self.log(f"connect_plc error: {exc}")
-
 
     def disconnect_plc(self) -> None:
         try:
@@ -275,7 +279,6 @@ class Widget(QWidget, Ui_wgDelta_Control):
     def _collect_teaching_values(self) -> None:
         self.plc.o_zPrePick = self._to_int(self.lineZPrepick)
         self.plc.o_zClass = self._to_int(self.lineZClass)
-        self.plc.o_zPitchClass = self._to_int(self.lineZPitchClass)
         self.plc.o_yPitchClass = self._to_int(self.lineYPitchClass1)
         self.plc.o_xClass1 = self._to_int(self.lineXClass1)
         self.plc.o_yClass1 = self._to_int(self.lineYClass1)
@@ -283,6 +286,18 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_RadiusEE = self._to_int(self.lineEeRadius)
         self.plc.o_BicepLength = self._to_int(self.lineBicepLength)
         self.plc.o_ForeArmLength = self._to_int(self.lineForeArmLength)
+
+        #Robot Teaching
+        self.plc.o_OffsetX = self._to_int(self.lineOffsetCamX)
+        self.plc.o_OffsetY = self._to_int(self.lineOffsetCamY)
+        self.plc.o_pixelRate = self._to_int(self.lineRatePixel)
+
+        self.plc.o_xClass1 = self._to_int(self.lineXClass1)
+        self.plc.o_yClass1 = self._to_int(self.lineYClass1)
+        self.plc.o_zClass = self._to_int(self.lineZClass)
+        self.plc.o_yPitchClass = self._to_int(self.lineYPitchClass1)
+        self.plc.o_zPrePick = self._to_int(self.lineZPrepick)
+        self.plc.o_zObject = self._to_int(self.lineZoffsetPd)
 
     def _to_int(self, edit: Any) -> int:
         return int(edit.text() or 0)
@@ -306,23 +321,15 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.plc.o_arm1RunSpeed = self._to_int(self.lineArm1RunSpeed)
         self.plc.o_arm1Ramp = self._to_int(self.lineArm1Ramp)
         self.plc.o_arm1JogSpeed = self._to_int(self.lineArm1JogSpeed)
-        self.plc.o_arm1gear = self._to_int(self.lineArm1Gear)
-        self.plc.o_arm1MicroStep = self._to_int(self.lineArm1MicroStepMode)
         self.plc.o_arm2Ramp = self._to_int(self.lineArm2Ramp)
         self.plc.o_arm2JogSpeed = self._to_int(self.lineArm2JogSpeed)
-        self.plc.o_arm2gear = self._to_int(self.lineArm2Gear)
-        self.plc.o_arm2MicroStep = self._to_int(self.lineArm2MicroStepMode)
         self.plc.o_arm3Ramp = self._to_int(self.lineArm3Ramp)
         self.plc.o_arm3JogSpeed = self._to_int(self.lineArm3JogSpeed)
-        self.plc.o_arm3gear = self._to_int(self.lineArm3Gear)
-        self.plc.o_arm3MicroStep = self._to_int(self.lineArm3MicroStepMode)
         self.plc.o_ConvRunSpeed = self._to_int(self.lineConvSpeed)
 
     def polling_data(self) -> None:
         try:
-            if self.plc.is_connected():
-                pass
-            else:
+            if not self.plc.is_connected():
                 return
         except:
             return
@@ -366,8 +373,6 @@ class Widget(QWidget, Ui_wgDelta_Control):
         try:
             if self.plc.is_connected():
                 self.lblConnectStatus.setText("Connected")
-
-                self.log(self.plc.i_autoModeReady)
             else:
                 self.lblConnectStatus.setText("No Connection")
         except:
@@ -385,17 +390,18 @@ class Widget(QWidget, Ui_wgDelta_Control):
     def start_auto_cycle(self):
         """Bắt đầu chu trình tự động PLC+Vision"""
         try:
-            if self.plc and self.vision:
-                pass
-            else:
+            if not self.plc or not self.vision:
+                self.lblRobotStatus.setText("PLC or Vision not connected")
                 return
         except:
+            self.lblRobotStatus.setText("PLC or Vision not connected")
             return 
 
         if not hasattr(self, 'vision_plc') or self.vision_plc is None:
             self.vision_plc = VisionPlcHandler(self.plc, self.vision)
+            self.vision_plc.status.connect(self.lblRobotStatus.setText)
+            self.vision_plc.log.connect(self.log)
 
-        self.vision_plc.status.connect(self.lblRobotStatus.setText)
         self.vision_plc.run_cycle()
     #endregion
     

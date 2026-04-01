@@ -150,16 +150,16 @@ class plc_map:
         self.o_visionObjectType = -1      # Object type (1=yellow, 2=red, 3=blue)
         self.o_visionEncoder = -1    
 
-        self.o_deltaData30 = -1
+        self.o_pixelRate = -1
         #Conveyor
         self.o_ConvRunSpeed = -1
         self.o_ConvRamp = -1
-        self.o_deltaData33 = -1
-        self.o_deltaData34 = -1 
+        self.o_OffsetX = -1
+        self.o_OffsetY = -1 
         #Pick & Place
         self.o_zPrePick = -1
         self.o_zClass = -1
-        self.o_zPitchClass = -1
+        self.o_zObject = -1
         self.o_yPitchClass = -1
         self.o_xClass1 = -1
         self.o_yClass1 = -1
@@ -232,11 +232,11 @@ class plc_map:
         self.i_deltaData27 = self.i_Data[27]
         self.i_deltaData28 = self.i_Data[28]
         self.i_deltaData29 = self.i_Data[29]
-        self.i_deltaData30 = self.i_Data[30]
+        self.i_pixelRate = self.i_Data[30]
         self.i_deltaData31 = self.i_Data[31]
         self.i_deltaData32 = self.i_Data[32]
-        self.i_deltaData33 = self.i_Data[33]
-        self.i_deltaData34 = self.i_Data[34]
+        self.i_OffsetX = self.i_Data[33]
+        self.i_OffsetY = self.i_Data[34]
         self.i_deltaData35 = self.i_Data[35]
         self.i_deltaData36 = self.i_Data[36]
         self.i_deltaData37 = self.i_Data[37]
@@ -289,8 +289,8 @@ class plc_map:
         self.o_Data[6] = self.o_xTestPos
         self.o_Data[7] = self.o_yTestPos
         self.o_Data[8] = self.o_zTestPos
-        self.o_Data[9] = self.o_deltaData9
-        self.o_Data[10] = self.o_deltaData10
+        self.o_Data[9] = self.o_xClass1
+        self.o_Data[10] = self.o_yClass1
         #arm2
         self.o_Data[11] = self.o_arm2RunSpeed
         self.o_Data[12] = self.o_arm2Ramp
@@ -313,15 +313,15 @@ class plc_map:
         self.o_Data[27] = self.o_visionObjectY
         self.o_Data[28] = self.o_visionObjectType
         self.o_Data[29] = self.o_visionEncoder
-        self.o_Data[30] = self.o_deltaData30
+        self.o_Data[30] = self.o_pixelRate
 
         self.o_Data[31] = self.o_ConvRunSpeed
         self.o_Data[32] = self.o_ConvRamp
-        self.o_Data[33] = self.o_deltaData33
-        self.o_Data[34] = self.o_deltaData34
+        self.o_Data[33] = self.o_OffsetX
+        self.o_Data[34] = self.o_OffsetY
         self.o_Data[35] = self.o_zPrePick
         self.o_Data[36] = self.o_zClass
-        self.o_Data[37] = self.o_zPitchClass
+        self.o_Data[37] = self.o_zObject
         self.o_Data[38] = self.o_yPitchClass
-        self.o_Data[39] = self.o_xClass1
-        self.o_Data[40] = self.o_yClass1
+        self.o_Data[39] = -1
+        self.o_Data[40] = -1
