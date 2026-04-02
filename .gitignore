@@ -1,30 +1,34 @@
-# --- Python (InterfaceApp, yolo) ---
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-.venv/
+*.so
+.env
 venv/
-ENV/
 *.log
 
-# --- TIA Portal (S7_1200_Program) ---
-# Loại bỏ các file tạm và file khóa gây lỗi "Permission denied"
-S7_1200_Program/IM/
-S7_1200_Program/Logs/
-S7_1200_Program/System/
-S7_1200_Program/UserFiles/
-S7_1200_Program/**/*.ldf
-S7_1200_Program/**/*.mdf
-S7_1200_Program/**/~*
+# Project specific
+*.cache
 
-# --- YOLO & Vision ---
-# Nếu bạn có bộ dữ liệu ảnh nặng hoặc model đã train (.pt)
-InterfaceApp/yolo/runs/
+# YOLO/Vision
 *.pt
 *.onnx
+InterfaceApp/vision/runs/
 
-# --- OS & Editor ---
-.vscode/
-.idea/
+# TIA Portal
+S7_1200_Program/IM/
+S7_1200_Program/Logs/
+S7_1200_Program/**/*.db
+S7_1200_Program/**/*.ldf
+S7_1200_Program/**/*.mdf
+S7_1200_Program/XRef/
+S7_1200_Program/Vci/
+S7_1200_Program.backup/
+
+# OS
 Thumbs.db
 .DS_Store
+*.lnk
+
+# IDE
+.vscode/
+.idea/

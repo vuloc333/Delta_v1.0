@@ -77,13 +77,13 @@ class VisionPlcHandler(QObject):
             })
             
             # Đủ 10 mẫu, kiểm tra 7/10 giống nhau
-            if len(self.detection_buffer) >= 10:
+            if len(self.detection_buffer) >= 5:
                 # Cách ngắn gọn để lấy giá trị id duyệt qua detection_buffer
                 ids = [d['id'] for d in self.detection_buffer]
                 id_counts = Counter(ids)
                 most_common_id, count = id_counts.most_common(1)[0]
                 
-                if count >= 7:  # 7/10 trở lên = hợp lệ
+                if count >= 3:  # 7/10 trở lên = hợp lệ
                     # Lấy object cuối cùng có ID phổ biến nhất - reversed() - cho chạy for ngược
                     for d in reversed(self.detection_buffer):
                         if d['id'] == most_common_id:

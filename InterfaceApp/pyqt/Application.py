@@ -50,7 +50,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
         self.CheckConnection.timeout.connect(self.check_plc_connection)
          
         self.CheckConnection.start(2000)
-        self.Sync.start(80)
+        self.Sync.start(50)
         # endregion
     
     def init_vision(self):
