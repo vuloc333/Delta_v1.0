@@ -2,6 +2,7 @@ import datetime
 from typing import Any
 
 from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QIntValidator
 from PyQt6.QtWidgets import QWidget
 from pyqt.Services.ui_widget import Ui_wgDelta_Control
 from pyqt.Services.config_load import ConfigManager
@@ -14,6 +15,9 @@ class Widget(QWidget, Ui_wgDelta_Control):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("Delta Robot Control Panel")
+        # region Setup Validators for integer-only LineEdits
+        self._setup_int_validators()
+        # endregion
         # region UI Setup
         self.config_manager = ConfigManager("pyqt\\Services\\config.json")
         
@@ -136,6 +140,46 @@ class Widget(QWidget, Ui_wgDelta_Control):
         except Exception as e:
             print(f"Load vision config error: {e}")
     
+    def _setup_int_validators(self) -> None:
+        """Thiết lập validator chỉ cho phép nhập số nguyên cho các LineEdit"""
+        int_validator = QIntValidator()
+
+        # Robot kinematic parameters
+        self.lineBaseRadius.setValidator(int_validator)
+        self.lineEeRadius.setValidator(int_validator)
+        self.lineBicepLength.setValidator(int_validator)
+        self.lineForeArmLength.setValidator(int_validator)
+
+        # Arm speeds and ramps
+        self.lineArm1RunSpeed.setValidator(int_validator)
+        self.lineArm1Ramp.setValidator(int_validator)
+        self.lineArm1JogSpeed.setValidator(int_validator)
+        self.lineArm2Ramp.setValidator(int_validator)
+        self.lineArm2JogSpeed.setValidator(int_validator)
+        self.lineArm3Ramp.setValidator(int_validator)
+        self.lineArm3JogSpeed.setValidator(int_validator)
+
+        # Conveyor
+        self.lineConvSpeed.setValidator(int_validator)
+
+        # Teaching positions
+        self.lineZPrepick.setValidator(int_validator)
+        self.lineZoffsetPd.setValidator(int_validator)
+        self.lineZClass.setValidator(int_validator)
+        self.lineXClass1.setValidator(int_validator)
+        self.lineYClass1.setValidator(int_validator)
+        self.lineYPitchClass1.setValidator(int_validator)
+
+        # Test targets (inverse kinematic)
+        self.lineXtestTarget.setValidator(int_validator)
+        self.lineYtestTarget.setValidator(int_validator)
+        self.lineZtestTarget.setValidator(int_validator)
+
+        # Vision parameters
+        self.lineOffsetCamX.setValidator(int_validator)
+        self.lineOffsetCamY.setValidator(int_validator)
+        self.lineRatePixel.setValidator(int_validator)
+
     # region Save/Load Config
 
     def save_config(self) -> None:
@@ -340,9 +384,16 @@ class Widget(QWidget, Ui_wgDelta_Control):
     def updateUi(self) -> None:
 
         self.plc.Read_data()
+        #Positioning
         self.lineArm1CurPos.setText(str(self.plc.i_Arm1CurPos))
         self.lineArm2CurPos.setText(str(self.plc.i_Arm2CurPos))
         self.lineArm3CurPos.setText(str(self.plc.i_Arm3CurPos))
+
+        #Product Count
+        self.linePdYel.setText(str(self.plc.i_YelCirCount))
+        self.linePdRed.setText(str(self.plc.i_RedRecCount))
+        self.linePdBlu.setText(str(self.plc.i_BlueTriCount))
+
 
     def updatePlc(self) -> None:
 
@@ -391,18 +442,48 @@ class Widget(QWidget, Ui_wgDelta_Control):
         """Bắt đầu chu trình tự động PLC+Vision"""
         try:
             if not self.plc or not self.vision:
-                self.lblRobotStatus.setText("PLC or Vision not connected")
+                self.lblRobotStatus.setText("Chưa kết nối Robot")
                 return
         except:
-            self.lblRobotStatus.setText("PLC or Vision not connected")
+            self.lblRobotStatus.setText("Chưa kết nối Robot")
             return 
 
         if not hasattr(self, 'vision_plc') or self.vision_plc is None:
             self.vision_plc = VisionPlcHandler(self.plc, self.vision)
-            self.vision_plc.status.connect(self.lblRobotStatus.setText)
             self.vision_plc.log.connect(self.log)
 
         self.vision_plc.run_cycle()
+
+    def auto_cycle_status(self):
+
+        object_type = ""
+
+        match self.plc.o_visionObjectType:
+            case 0: 
+                object_type = "Vàng tròn"
+            case 1: 
+                object_type = "Đỏ vuông"
+            case 2: 
+                object_type = "Xanh tam giác"
+
+        match self.plc.o_autoCycleStatus:
+            case 0:
+                self.lineRobotStatus.setText("Chế độ tự động đang chờ...")
+            case 1:
+                self.lineRobotStatus.setText("Đang lấy gốc...")
+            case 2:
+                self.lineRobotStatus.setText("Đang di chuyển tới vị trí chờ")
+            case 4:
+                self.lineRobotStatus.setText(f"Đã nhận dữ liệu sản phẩm, đang phân loại... {object_type}")
+            case 6:
+                self.lineRobotStatus.setText(f"Đã nhận dữ liệu sản phẩm, đang phân loại... {object_type}")
+            case 7:
+                self.lineRobotStatus.setText(f"Đã nhận sản phẩm {object_type}")
+            case 8:
+                self.lineRobotStatus.setText(f"Đang phân loại")
+            case 10:
+                self.lineRobotStatus.setText(f"Hoàn thành!")
+
     #endregion
     
     def log(self, message: Any) -> None:

@@ -12,7 +12,7 @@ class Step(Enum):
 
 
 class VisionPlcHandler(QObject):
-    """Xử lý chu trình Vision + PLC"""
+
     status = pyqtSignal(str)
     log = pyqtSignal(str)
     
@@ -58,7 +58,7 @@ class VisionPlcHandler(QObject):
             self.detection_buffer.clear()
             self.step = Step.VERIFY_OBJ
             self.log.emit("PLC ready, verifying object...")
-        self.status.emit("Waiting for PLC...")
+
     def _step_verify(self):
         """Step 2: Kiểm tra 10 khung hình để xác nhận (cần 7/10 đúng)"""
         from collections import Counter
@@ -91,7 +91,7 @@ class VisionPlcHandler(QObject):
                             break
                     c = self.verified_object['class']
                     x, y = self.verified_object['x'], self.verified_object['y']
-                    self.status.emit(f"Verified {c} at ({x},{y}) ({count}/10)")
+                    self.log.emit(f"Verified {c} at ({x},{y}) ({count}/10)")
                     self.detection_buffer.clear()
                     self.step = Step.SEND_DATA
                 else:
@@ -99,7 +99,6 @@ class VisionPlcHandler(QObject):
                     self.detection_buffer.popleft()
         else:
             # Không detect được, quay lại đợi PLC
-            self.status.emit("No object detected")
             self.detection_buffer.clear()
             self.step = Step.WAIT_PLC
             

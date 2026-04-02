@@ -164,6 +164,8 @@ class plc_map:
         self.o_xClass1 = -1
         self.o_yClass1 = -1
 
+        self.o_autoCycleStatus = -1
+
     def _decode_input_bits(self, data_read: bytes) -> None:
         for i in range(self.byteofBit):
             for j in range(8):
@@ -207,9 +209,9 @@ class plc_map:
         self.i_Arm2CurPos = self.i_Data[2]
         self.i_Arm3CurPos = self.i_Data[3]
         self.i_deltaData4 = self.i_Data[4]
-        self.i_deltaData5 = self.i_Data[5]
-        self.i_deltaData6 = self.i_Data[6]
-        self.i_deltaData7 = self.i_Data[7]
+        self.i_YelCirCount = self.i_Data[5]
+        self.i_RedRecCount = self.i_Data[6]
+        self.i_BlueTriCount = self.i_Data[7]
         self.i_deltaData8 = self.i_Data[8]
         self.i_deltaData9 = self.i_Data[9]
         self.i_deltaData10 = self.i_Data[10]
@@ -323,5 +325,5 @@ class plc_map:
         self.o_Data[36] = self.o_zClass
         self.o_Data[37] = self.o_zObject
         self.o_Data[38] = self.o_yPitchClass
-        self.o_Data[39] = -1
+        self.o_Data[39] = self.o_autoCycleStatus
         self.o_Data[40] = -1
