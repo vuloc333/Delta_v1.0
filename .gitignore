@@ -17,12 +17,10 @@ InterfaceApp/vision/runs/
 # TIA Portal
 S7_1200_Program/IM/
 S7_1200_Program/Logs/
-S7_1200_Program/**/*.db
-S7_1200_Program/**/*.ldf
-S7_1200_Program/**/*.mdf
-S7_1200_Program/XRef/
-S7_1200_Program/Vci/
-S7_1200_Program.backup/
+S7_1200_Program/System/
+S7_1200_Program/UserFiles/
+S7_1200_Program/Temp/
+S7_1200_Program/**/~*
 
 # OS
 Thumbs.db
