@@ -453,7 +453,8 @@ class Widget(QWidget, Ui_wgDelta_Control):
             self.vision_plc.log.connect(self.log)
 
         self.vision_plc.run_cycle()
-
+        self.auto_cycle_status()
+        
     def auto_cycle_status(self):
 
         object_type = ""
@@ -482,7 +483,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
             case 8:
                 self.lineRobotStatus.setText(f"Đang phân loại")
             case 10:
-                self.lineRobotStatus.setText(f"Hoàn thành!")
+                self.lineRobotStatus.setText(f"Hoàn thành phân loại sản phẩm {object_type}!")
 
     #endregion
     
