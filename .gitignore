@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.env
+/InterfaceApp/venv/
+*.log
+/venv/
+
+
+# Project specific
+*.cache
+
+# YOLO/Vision
+*.pt
+*.onnx
+InterfaceApp/vision/runs/
+
+# OS
+Thumbs.db
+.DS_Store
+*.lnk
+
+# IDE
+.vscode/
+.idea/

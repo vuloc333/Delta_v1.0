@@ -1,0 +1,12 @@
+# --- GUI ---
+PyQt6
+
+# --- Vision (YOLO & AI) ---
+ultralytics
+torch
+torchvision
+opencv-python
+
+# --- Communication & Logic ---
+python-snap7
+numpy

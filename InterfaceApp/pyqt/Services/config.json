@@ -1,0 +1,49 @@
+{
+    "connection": {
+        "ip_plc": "192.168.1.111"
+    },
+    "robot_params": {
+        "Para": {
+            "RadiusBase": 93,
+            "RadiusEE": 35,
+            "BicepLength": 165,
+            "ForeArmLength": 354
+        },
+        "arm1": {
+            "run_speed": 800,
+            "ramp": 100,
+            "jog_speed": 300
+        },
+        "arm2": {
+            "ramp": 100,
+            "jog_speed": 300
+        },
+        "arm3": {
+            "ramp": 100,
+            "jog_speed": 300
+        },
+        "teaching": {
+            "z_prepick": -400,
+            "z_offset_pd": -415,
+            "z_class": -420,
+            "x_class1": -80,
+            "y_class1": -50,
+            "y_pitch_class1": 50
+        },
+        "conveyor": {
+            "speed": 1500
+        }
+    },
+    "vision_roi": {
+        "x": 257,
+        "y": 148,
+        "w": 104,
+        "h": 252
+    },
+    "vision_params": {
+        "offset_x": 313,
+        "offset_y": 158,
+        "pixel_rate": 105
+    },
+    "last_update": "2026-04-03 00:29:19"
+}
