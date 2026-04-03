@@ -7,14 +7,16 @@ __pycache__/
 *.log
 /venv/
 
-
 # Project specific
 *.cache
 
 # YOLO/Vision
+/InterfaceApp/vision/dataset/
+/InterfaceApp/vision/runs/
+/vision/dataset/
+/vision/runs/
 *.pt
 *.onnx
-InterfaceApp/vision/runs/
 
 # OS
 Thumbs.db

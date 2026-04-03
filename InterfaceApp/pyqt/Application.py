@@ -392,7 +392,7 @@ class Widget(QWidget, Ui_wgDelta_Control):
         #Product Count
         self.linePdYel.setText(str(self.plc.i_YelCirCount))
         self.linePdRed.setText(str(self.plc.i_RedRecCount))
-        self.linePdBlu.setText(str(self.plc.i_BlueTriCount))
+        #self.linePdBlu.setText(str(self.plc.i_BlueTriCount))
 
 
     def updatePlc(self) -> None:

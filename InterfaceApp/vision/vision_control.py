@@ -14,9 +14,8 @@ class VisionProcessor(QThread):
     """Thread xử lý camera và YOLO"""
     frame_ready = pyqtSignal(object, list)  # frame(numpy), detections
     
-    def __init__(self, label, camera_id=1):
+    def __init__(self, camera_id=1):
         super().__init__()
-        self.label = label
         self.camera_id = camera_id
         self.running = False
         self.cap = None
@@ -84,7 +83,7 @@ class VisionProcessor(QThread):
             return frame, []
         
         # YOLO detect
-        results = self.model.predict(roi, verbose=False, iou=0.01, conf=0.15)
+        results = self.model.predict(roi, verbose=False, iou=0.2, conf=0.35)
         
         detections = []
         for r in results:
@@ -134,8 +133,8 @@ class VisionProcessor(QThread):
         self.wait()
         
     def get_detections(self):
-        """Get latest detections"""
-        return self.detections
+        """Get latest detections, loại bỏ object id 0"""
+        return [d for d in self.detections if d.get('id', 0) != 0]
         
     def get_frame_size(self):
         """Get camera frame size"""
@@ -146,7 +145,7 @@ class VisionControl:
     """API cho UI - đơn giản, chỉ chuyển tiếp"""
     def __init__(self, label, camera_id=1):
         self.label = label
-        self.thread = VisionProcessor(label, camera_id)
+        self.thread = VisionProcessor(camera_id)
         self.thread.frame_ready.connect(self._update_ui)
         
     def _update_ui(self, frame, detections):
@@ -173,7 +172,8 @@ class VisionControl:
         self.thread.set_roi(x, y, w, h)
     
     def get_detections(self):
-        return self.thread.detections
+        """Get latest detections, loại bỏ object id 0"""
+        return self.thread.get_detections()
     
     def get_frame_size(self):
         return self.thread.frame_width, self.thread.frame_height

@@ -26,24 +26,24 @@
             "z_prepick": -400,
             "z_offset_pd": -415,
             "z_class": -420,
-            "x_class1": -80,
+            "x_class1": -90,
             "y_class1": -50,
-            "y_pitch_class1": 50
+            "y_pitch_class1": 80
         },
         "conveyor": {
             "speed": 1500
         }
     },
     "vision_roi": {
-        "x": 257,
-        "y": 148,
-        "w": 104,
-        "h": 252
+        "x": 279,
+        "y": 96,
+        "w": 95,
+        "h": 310
     },
     "vision_params": {
-        "offset_x": 313,
-        "offset_y": 158,
+        "offset_x": 325,
+        "offset_y": 67,
         "pixel_rate": 105
     },
-    "last_update": "2026-04-03 00:29:19"
+    "last_update": "2026-04-03 23:36:57"
 }

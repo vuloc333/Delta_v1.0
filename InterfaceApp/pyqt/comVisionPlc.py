@@ -66,8 +66,17 @@ class VisionPlcHandler(QObject):
         dets = self.vision.get_detections()
         
         if dets:
-            # Lấy vùng data trong yol0
-            obj = dets[0]
+            # Tìm object có id != 0 đầu tiên
+            obj = None
+            for d in dets:
+                if d.get('id', 0) != 0:
+                    obj = d
+                    break
+            
+            # Không có object hợp lệ
+            if obj is None:
+                return
+                
             # Gán data vào buffer
             self.detection_buffer.append({
                 'id': obj.get('id', 0),

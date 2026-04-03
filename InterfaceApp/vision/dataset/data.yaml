@@ -8,6 +8,6 @@ names: ['BlueTri', 'RedRec', 'YelCir']
 roboflow:
   workspace: vus-workspace-1gzco
   project: demo-on-conveyor
-  version: 2
+  version: 3
   license: CC BY 4.0
-  url: https://universe.roboflow.com/vus-workspace-1gzco/demo-on-conveyor/dataset/2
+  url: https://universe.roboflow.com/vus-workspace-1gzco/demo-on-conveyor/dataset/3
