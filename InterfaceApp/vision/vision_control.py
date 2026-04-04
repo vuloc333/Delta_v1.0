@@ -71,47 +71,61 @@ class VisionProcessor(QThread):
         self.roi_h = max(1, h)
         
     def detect(self, frame):
-        """Detect vật thể trong ROI, trả về frame đã vẽ và danh sách detection"""
-        # Tính ROI trong frame
-        x1 = min(self.roi_x, frame.shape[1])
-        y1 = min(self.roi_y, frame.shape[0])
-        x2 = min(self.roi_x + self.roi_w, frame.shape[1])
-        y2 = min(self.roi_y + self.roi_h, frame.shape[0])
-        
-        roi = frame[y1:y2, x1:x2]
-        if roi.size == 0 or self.model is None:
+        """Detect toàn frame, chỉ giữ vật NGOÀI ROI, loại BlueTri, chọn vật gần gốc tọa độ nhất"""
+        if frame is None or self.model is None:
             return frame, []
         
-        # YOLO detect
-        results = self.model.predict(roi, verbose=False, iou=0.2, conf=0.35)
+        # ROI bounds
+        rx1 = min(self.roi_x, frame.shape[1])
+        ry1 = min(self.roi_y, frame.shape[0])
+        rx2 = min(self.roi_x + self.roi_w, frame.shape[1])
+        ry2 = min(self.roi_y + self.roi_h, frame.shape[0])
         
-        detections = []
+        # YOLO detect trên toàn frame
+        results = self.model.predict(frame, verbose=False, iou=0.2, conf=0.35)
+        
+        all_detections = []
         for r in results:
             for box in r.boxes:
                 x, y, bw, bh = box.xywh[0].cpu().numpy()
                 conf = float(box.conf[0])
                 cls = int(box.cls[0])
+                x, y = int(x), int(y)
                 
-                # Tọa độ toàn cục
-                abs_x = int(x) + x1
-                abs_y = int(y) + y1
+                # Mapping class ID: 0=BlueTri (loại), 1=RedRec→2, 2=YelCir→1
+                id_map = {0: None, 1 : 1, 2 : 2}
+                mapped_id = id_map.get(cls)
+                if mapped_id is None:
+                    continue
+                    
+                # Chỉ giữ vật TRONG ROI
+                in_roi = (rx1 <= x <= rx2) and (ry1 <= y <= ry2)
+                if not in_roi:
+                    continue
+                
                 name = r.names.get(cls, str(cls))
-                
-                detections.append({
-                    'id': cls, 'class': name, 'x': abs_x, 'y': abs_y, 'confidence': conf
+                all_detections.append({
+                    'id': mapped_id, 'class': name, 'x': x, 'y': y, 
+                    'w': int(bw), 'h': int(bh), 'confidence': conf
                 })
-                
-                # Vẽ box
-                x1b, y1b = int(abs_x - bw/2), int(abs_y - bh/2)
-                x2b, y2b = int(abs_x + bw/2), int(abs_y + bh/2)
-                cv2.rectangle(frame, (x1b, y1b), (x2b, y2b), (0, 255, 0), 2)
-                cv2.putText(frame, f"{name} {conf:.2f}", (x1b, y1b-5), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
         
-        # Vẽ ROI border
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
+        # Vẽ ROI border (màu đỏ)
+        cv2.rectangle(frame, (rx1, ry1), (rx2, ry2), (0, 0, 255), 2)
+        cv2.putText(frame, "ROI", (rx1, ry1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         
-        return frame, detections
+        # Chọn vật có tọa độ nhỏ nhất (x+y nhỏ nhất)
+        if all_detections:
+            best = min(all_detections, key=lambda d: d['x'] + d['y'])
+            # Chỉ vẽ vật được chọn
+            bw, bh = best['w'], best['h']
+            x1b, y1b = int(best['x'] - bw/2), int(best['y'] - bh/2)
+            x2b, y2b = int(best['x'] + bw/2), int(best['y'] + bh/2)
+            cv2.rectangle(frame, (x1b, y1b), (x2b, y2b), (0, 255, 0), 2)
+            cv2.putText(frame, f"{best['class']} {best['confidence']:.2f}", (x1b, y1b-5), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
+            return frame, [best]
+        
+        return frame, []
         
     def run(self):
         if not self.load_model() or not self.init_camera():
